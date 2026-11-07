@@ -285,7 +285,7 @@ class _AddLivestockBottomSheetState extends State<AddLivestockBottomSheet> {
                       ),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<String>(
-                        value: _selectedCategory,
+                        initialValue: _selectedCategory,
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -347,7 +347,7 @@ class _AddLivestockBottomSheetState extends State<AddLivestockBottomSheet> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              value: _selectedGender,
+                              initialValue: _selectedGender,
                               decoration: const InputDecoration(labelText: 'Kelamin', isDense: true),
                               items: const [
                                 DropdownMenuItem(value: 'Jantan', child: Text('Jantan', style: TextStyle(fontSize: 13))),
@@ -406,8 +406,8 @@ class _AddLivestockBottomSheetState extends State<AddLivestockBottomSheet> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: const [
+                            const Row(
+                              children: [
                                 Icon(Icons.restaurant_rounded, size: 16, color: Color(0xFF196B4A)),
                                 SizedBox(width: 6),
                                 Text(

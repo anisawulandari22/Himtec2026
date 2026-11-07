@@ -373,10 +373,10 @@ class _PestScreenState extends State<PestScreen> {
                       child: const Icon(Icons.document_scanner_rounded, color: Colors.white, size: 22),
                     ),
                     const SizedBox(width: 12),
-                    Expanded(
+                    const Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Row(
                             children: [
                               Text(

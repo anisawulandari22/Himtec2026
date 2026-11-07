@@ -3,8 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/crop_provider.dart';
 import '../../../core/providers/livestock_provider.dart';
-import '../../../models/crop_model.dart';
-import '../../../models/livestock_model.dart';
 import '../crop/add_crop_bottom_sheet.dart';
 import '../crop/detail_crop_screen.dart';
 import '../livestock/add_livestock_bottom_sheet.dart';
@@ -72,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           // Header Greeting & Avatar
           Row(
-            mainAxisAlignment: MainAxisAlignment.between,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
@@ -86,9 +84,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: const Icon(Icons.eco_rounded, color: Colors.white, size: 24),
                   ),
                   const SizedBox(width: 12),
-                  Column(
+                  const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         'AGL • AGRICULTURE & LIVESTOCK',
                         style: TextStyle(
@@ -160,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.between,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
@@ -174,9 +172,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: const Icon(Icons.wb_sunny_rounded, color: Color(0xFFFFE77E), size: 30),
                     ),
                     const SizedBox(width: 14),
-                    Column(
+                    const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
                           '31°',
                           style: TextStyle(
@@ -195,9 +193,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-                Column(
+                const Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
-                  children: const [
+                  children: [
                     Row(
                       children: [
                         Icon(Icons.location_on_rounded, color: Colors.white, size: 14),
@@ -241,10 +239,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: const Icon(Icons.warning_amber_rounded, color: Color(0xFFED7148), size: 20),
                 ),
                 const SizedBox(width: 12),
-                Expanded(
+                const Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         'Peringatan cuaca panas',
                         style: TextStyle(
@@ -299,10 +297,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: const Icon(Icons.document_scanner_rounded, color: Colors.white, size: 26),
                   ),
                   const SizedBox(width: 14),
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Row(
                           children: [
                             Text(
@@ -439,12 +437,12 @@ class _HomeScreenState extends State<HomeScreen> {
           // TAMPILAN SEKTOR PERTANIAN
           if (_mainSectorIndex == 0) ...[
             Row(
-              mainAxisAlignment: MainAxisAlignment.between,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Column(
+                const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       'KEBUN ANDA',
                       style: TextStyle(
@@ -525,8 +523,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(color: const Color(0xFFE2E8E3)),
                 ),
-                child: Column(
-                  children: const [
+                child: const Column(
+                  children: [
                     Icon(Icons.eco_outlined, size: 48, color: Color(0xFF72827C)),
                     SizedBox(height: 12),
                     Text(
@@ -658,12 +656,12 @@ class _HomeScreenState extends State<HomeScreen> {
           // TAMPILAN SEKTOR PETERNAKAN
           else ...[
             Row(
-              mainAxisAlignment: MainAxisAlignment.between,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Column(
+                const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       'KANDANG ANDA',
                       style: TextStyle(
@@ -744,8 +742,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(color: const Color(0xFFE2E8E3)),
                 ),
-                child: Column(
-                  children: const [
+                child: const Column(
+                  children: [
                     Icon(Icons.pets_outlined, size: 48, color: Color(0xFF72827C)),
                     SizedBox(height: 12),
                     Text(

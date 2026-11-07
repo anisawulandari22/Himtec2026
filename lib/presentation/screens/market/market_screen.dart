@@ -196,9 +196,9 @@ class _MarketScreenState extends State<MarketScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
+                        const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
                               'PILIH KOTA & WILAYAH PASAR',
                               style: TextStyle(

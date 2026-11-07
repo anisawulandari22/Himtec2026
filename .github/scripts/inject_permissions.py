@@ -21,3 +21,4 @@ if os.path.exists(manifest_path):
         print("Permissions already present in AndroidManifest.xml")
 else:
     print(f"Manifest not found at {manifest_path}")
+

@@ -74,9 +74,9 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
+                  const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         'JURNAL HARIAN',
                         style: TextStyle(
@@ -116,9 +116,9 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                   borderRadius: BorderRadius.circular(18),
                   color: const Color(0xFFF5F8F1),
                 ),
-                child: Column(
+                child: const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Icon(Icons.camera_alt_outlined, color: Color(0xFF196B4A), size: 28),
                     SizedBox(height: 6),
                     Text(
@@ -347,9 +347,9 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
+                        const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text('RUTINITAS HARIAN', style: TextStyle(color: Color(0xFF72827C), fontSize: 10, fontWeight: FontWeight.bold)),
                             SizedBox(height: 2),
                             Text('Tugas Hari Ini', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),

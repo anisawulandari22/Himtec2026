@@ -37,6 +37,7 @@ class AppTheme {
   static const Color secondaryDark = Color(0xFFB5E2C4);
   static const Color onSecondaryDark = Color(0xFF1B4E32);
   static const Color secondaryContainerDark = Color(0xFF265A3D);
+  static const Color onSecondaryContainerDark = Color(0xFFD8F2E1);
 
   static const Color backgroundDark = Color(0xFF111714);
   static const Color surfaceDark = Color(0xFF17201B);
@@ -246,7 +247,7 @@ class AppTheme {
         ),
         margin: EdgeInsets.zero,
       ),
-      navigationBarTheme: NavigationBarThemeData(
+      navigationBarTheme: const NavigationBarThemeData(
         backgroundColor: surfaceDark,
         elevation: 0,
         indicatorColor: primaryContainerDark,

@@ -298,7 +298,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 6),
                         DropdownButtonFormField<String>(
-                          value: _selectedSector,
+                          initialValue: _selectedSector,
                           decoration: InputDecoration(
                             prefixIcon: const Icon(Icons.domain_rounded, size: 20, color: Color(0xFF72827C)),
                             filled: true,
@@ -457,8 +457,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(height: 16),
 
                         // Pembatas Atau
-                        Row(
-                          children: const [
+                        const Row(
+                          children: [
                             Expanded(child: Divider(color: Color(0xFFE2E8E3))),
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 10),

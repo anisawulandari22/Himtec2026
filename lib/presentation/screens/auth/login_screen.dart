@@ -398,8 +398,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 18),
 
                         // Pembatas Atau
-                        Row(
-                          children: const [
+                        const Row(
+                          children: [
                             Expanded(child: Divider(color: Color(0xFFE2E8E3))),
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 10),

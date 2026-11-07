@@ -23,7 +23,6 @@ class _DetailLivestockScreenState extends State<DetailLivestockScreen> {
   @override
   void initState() {
     super.initState();
-    final isCow = widget.livestock.category.contains('Sapi');
     final isGoat = widget.livestock.category.contains('Kambing') || widget.livestock.category.contains('Domba');
     final isPoultry = widget.livestock.category.contains('Ayam');
 
@@ -104,7 +103,7 @@ class _DetailLivestockScreenState extends State<DetailLivestockScreen> {
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Bobot ${item.name} berhasil diperbarui menjadi ${newWeight} kg!'),
+                    content: Text('Bobot ${item.name} berhasil diperbarui menjadi $newWeight kg!'),
                     behavior: SnackBarBehavior.floating,
                   ),
                 );
@@ -121,7 +120,6 @@ class _DetailLivestockScreenState extends State<DetailLivestockScreen> {
   Widget build(BuildContext context) {
     final livestockProvider = context.watch<LivestockProvider>();
     final item = livestockProvider.getLivestockById(widget.livestock.id) ?? widget.livestock;
-    final colorScheme = Theme.of(context).colorScheme;
 
     // Perhitungan Simulasi Jual Hidup vs Sembelih
     final double weight = item.currentWeightKg;
@@ -313,8 +311,8 @@ class _DetailLivestockScreenState extends State<DetailLivestockScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: const [
+                      const Row(
+                        children: [
                           Icon(Icons.restaurant_menu_rounded, color: Color(0xFF196B4A), size: 20),
                           SizedBox(width: 8),
                           Text(
@@ -374,8 +372,8 @@ class _DetailLivestockScreenState extends State<DetailLivestockScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: const [
+                            const Row(
+                              children: [
                                 Icon(Icons.medication_liquid_rounded, size: 16, color: Color(0xFFC26D00)),
                                 SizedBox(width: 6),
                                 Text(
@@ -447,9 +445,9 @@ class _DetailLivestockScreenState extends State<DetailLivestockScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
+                          const Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children: [
                               Text(
                                 'SIMULASI NILAI JUAL TERNAK',
                                 style: TextStyle(

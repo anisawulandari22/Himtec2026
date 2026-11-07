@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -128,15 +127,13 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
         imageBytes = await photo.readAsBytes();
       }
 
-      if (imageBytes != null) {
-        final result = await GeminiService.analyzeCropDisease(
-          imageBytes: imageBytes,
-          imagePath: imagePath,
-        );
+      final result = await GeminiService.analyzeCropDisease(
+        imageBytes: imageBytes,
+        imagePath: imagePath,
+      );
 
-        if (mounted) {
-          _showResultSheet(result);
-        }
+      if (mounted) {
+        _showResultSheet(result);
       }
     } catch (e) {
       if (mounted) {
@@ -213,8 +210,8 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: const [
+        title: const Row(
+          children: [
             Icon(Icons.key_rounded, color: Color(0xFF196B4A), size: 22),
             SizedBox(width: 8),
             Text('API Key Gemini', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
@@ -480,9 +477,9 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(color: const Color(0xFF196B4A)),
                   ),
-                  child: Column(
+                  child: const Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
+                    children: [
                       SizedBox(
                         width: 44,
                         height: 44,
