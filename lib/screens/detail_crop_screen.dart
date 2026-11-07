@@ -203,7 +203,7 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.18),
+                              color: Colors.white.withValues(alpha: 0.18),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text("Hari ke-${widget.crop.currentDay}", style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
