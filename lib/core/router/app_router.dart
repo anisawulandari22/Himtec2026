@@ -4,11 +4,12 @@ import 'package:go_router/go_router.dart';
 import '../../presentation/screens/drawer/help_screen.dart';
 import '../../presentation/screens/drawer/history_screen.dart';
 import '../../presentation/screens/drawer/settings_screen.dart';
-import '../../presentation/screens/explore/explore_screen.dart';
 import '../../presentation/screens/home/home_screen.dart';
 import '../../presentation/screens/main_wrapper.dart';
-import '../../presentation/screens/notifications/notifications_screen.dart';
+import '../../presentation/screens/market/market_screen.dart';
+import '../../presentation/screens/pest/pest_screen.dart';
 import '../../presentation/screens/profile/profile_screen.dart';
+import '../../presentation/screens/scan/disease_scan_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -38,9 +39,9 @@ class AppRouter {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/explore',
+                path: '/pest',
                 pageBuilder: (context, state) => const NoTransitionPage(
-                  child: ExploreScreen(),
+                  child: PestScreen(),
                 ),
               ),
             ],
@@ -48,9 +49,9 @@ class AppRouter {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/notifications',
+                path: '/market',
                 pageBuilder: (context, state) => const NoTransitionPage(
-                  child: NotificationsScreen(),
+                  child: MarketScreen(),
                 ),
               ),
             ],
@@ -82,7 +83,11 @@ class AppRouter {
         path: '/help',
         builder: (context, state) => const HelpScreen(),
       ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: '/scan',
+        builder: (context, state) => const DiseaseScanScreen(),
+      ),
     ],
   );
 }
-

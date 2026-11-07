@@ -37,7 +37,26 @@ jobs:
       - name: Generate Official Android Platform
         run: |
           rm -rf android
-          flutter create . --platforms=android --org=org.himtec --project-name=himtec_app
+          flutter create . --platforms=android --org=org.agl --project-name=agl_app
+          python3 -c '
+          import os
+          manifest_path = "android/app/src/main/AndroidManifest.xml"
+          if os.path.exists(manifest_path):
+              with open(manifest_path, "r") as f:
+                  content = f.read()
+              perms = """
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+"""
+              if "android.permission.CAMERA" not in content:
+                  content = content.replace("<manifest", "<manifest" + perms, 1)
+                  with open(manifest_path, "w") as f:
+                      f.write(content)
+                  print("Camera and Internet permissions successfully added to AndroidManifest.xml")
+          '
 
       - name: Get Dependencies
         run: flutter pub get
@@ -58,7 +77,7 @@ jobs:
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: himtec-app-apk
+          name: agl-app-apk
           path: build/app/outputs/flutter-apk/*.apk
           if-no-files-found: error
           retention-days: 14

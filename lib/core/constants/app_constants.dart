@@ -1,7 +1,9 @@
 class AppConstants {
   AppConstants._();
 
-  static const String appName = 'HIMTEC Mobile';
+  static const String appName = 'AGL';
+  static const String appFullName = 'Applied Agriculture & Livestock';
+  static const String appTagline = 'Aplikasi Terapan Pertanian & Peternakan Modern';
   static const String appVersion = 'v1.0.0';
 
   // Spacing & Padding
@@ -16,4 +18,3 @@ class AppConstants {
   static const double radiusMd = 10.0;
   static const double radiusLg = 14.0;
 }
-

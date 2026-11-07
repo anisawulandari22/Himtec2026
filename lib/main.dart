@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'core/constants/app_constants.dart';
+import 'core/providers/crop_provider.dart';
+import 'core/providers/livestock_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
@@ -21,15 +23,19 @@ void main() {
   );
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
-      child: const HimtecApp(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => CropProvider()),
+        ChangeNotifierProvider(create: (_) => LivestockProvider()),
+      ],
+      child: const AGLApp(),
     ),
   );
 }
 
-class HimtecApp extends StatelessWidget {
-  const HimtecApp({super.key});
+class AGLApp extends StatelessWidget {
+  const AGLApp({super.key});
 
   @override
   Widget build(BuildContext context) {

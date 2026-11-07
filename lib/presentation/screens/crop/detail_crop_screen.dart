@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../models/crop_model.dart';
+import 'package:provider/provider.dart';
+import '../../../core/providers/crop_provider.dart';
+import '../../../models/crop_model.dart';
 
 class DetailCropScreen extends StatefulWidget {
   final CropModel crop;
@@ -11,6 +13,36 @@ class DetailCropScreen extends StatefulWidget {
 }
 
 class _DetailCropScreenState extends State<DetailCropScreen> {
+  late final TextEditingController _journalNoteController;
+
+  @override
+  void initState() {
+    super.initState();
+    _journalNoteController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _journalNoteController.dispose();
+    super.dispose();
+  }
+
+  String _getExpertTip(String cropName) {
+    final lower = cropName.toLowerCase();
+    if (lower.contains('padi')) {
+      return 'Jaga ketinggian air macak-macak pada fase pembungaan dan lakukan pengeringan berkala (intermittent) untuk memperkuat perakaran serta mencegah wereng coklat.';
+    } else if (lower.contains('cabai') || lower.contains('cabe')) {
+      return 'Semprot pupuk kalsium-boron menjelang pembungaan untuk mencegah rontok bunga dan pastikan drainase bedengan lancar guna hindari antraknosa (patek).';
+    } else if (lower.contains('jagung')) {
+      return 'Lakukan pemupukan susulan kedua di umur 30-35 hari dan periksa pucuk daun secara berkala dari serangan ulat grayak jagung (FAW).';
+    } else if (lower.contains('bawang')) {
+      return 'Lakukan penyiraman rutin di pagi hari sebelum terik matahari untuk membersihkan embun jelaga dan pasang perangkap lampu guna memantau ulat grayak.';
+    } else if (lower.contains('tomat')) {
+      return 'Lakukan pewiwilan (pemangkasan tunas air liar) dan ikat batang tanaman ke ajir bambu agar sirkulasi udara optimal dan buah tidak menyentuh tanah.';
+    }
+    return 'Pertahankan nutrisi dan kelembapan media tanam optimal agar penyerapan nutrisi akar $cropName tetap prima hingga masa panen.';
+  }
+
   void _openJournalModal() {
     showModalBottomSheet(
       context: context,
@@ -40,7 +72,7 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
               ),
               const SizedBox(height: 15),
               Row(
-                mainAxisAlignment: MainAxisAlignment.between,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,7 +108,6 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                 ],
               ),
               const SizedBox(height: 20),
-              // Kotak Unggah Foto
               Container(
                 width: double.infinity,
                 height: 120,
@@ -101,6 +132,7 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
               ),
               const SizedBox(height: 14),
               TextField(
+                controller: _journalNoteController,
                 maxLines: 3,
                 decoration: InputDecoration(
                   hintText: 'Bagaimana kondisi tanaman Anda hari ini?',
@@ -122,9 +154,13 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
+                    _journalNoteController.clear();
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Perkembangan berhasil disimpan!')),
+                      const SnackBar(
+                        content: Text('Catatan perkembangan berhasil disimpan ke jurnal!'),
+                        behavior: SnackBarBehavior.floating,
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -134,7 +170,7 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                     elevation: 5,
                   ),
                   child: const Text(
-                    'Simpan perkembangan',
+                    'Simpan Perkembangan',
                     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                   ),
                 ),
@@ -146,8 +182,45 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
     );
   }
 
+  void _confirmDelete(BuildContext context, CropModel crop) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hapus Tanaman'),
+        content: Text('Apakah Anda yakin ingin menghapus "${crop.name}" dari kebun?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red[700]),
+            onPressed: () {
+              context.read<CropProvider>().removeCrop(crop.id);
+              Navigator.pop(ctx); // Close dialog
+              Navigator.pop(context); // Back to HomeScreen
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${crop.name} berhasil dihapus dari kebun.'),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final cropProvider = context.watch<CropProvider>();
+    final currentCrop = cropProvider.getCropById(widget.crop.id) ?? widget.crop;
+
+    final completedTasks = currentCrop.tasks.where((t) => t.isCompleted).length;
+    final totalTasks = currentCrop.tasks.length;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFAFBF7),
       body: SafeArea(
@@ -159,7 +232,7 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.between,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
                       onPressed: () => Navigator.pop(context),
@@ -170,12 +243,13 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                       ),
                     ),
                     Text(
-                      'Detail ${widget.crop.name}',
+                      'Detail ${currentCrop.name}',
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.bar_chart, size: 18),
+                      onPressed: () => _confirmDelete(context, currentCrop),
+                      tooltip: 'Hapus Tanaman',
+                      icon: const Icon(Icons.delete_outline_rounded, size: 20, color: Colors.redAccent),
                       style: IconButton.styleFrom(
                         backgroundColor: Colors.white,
                         side: const BorderSide(color: Color(0xFFE2E8E3)),
@@ -193,7 +267,7 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(26),
                   image: DecorationImage(
-                    image: NetworkImage(widget.crop.imagePath),
+                    image: NetworkImage(currentCrop.imagePath),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -218,7 +292,7 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        widget.crop.name,
+                        currentCrop.name,
                         style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white),
                       ),
                       const SizedBox(height: 8),
@@ -231,7 +305,7 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
-                              'Hari ke-${widget.crop.currentDay}',
+                              'Hari ke-${currentCrop.currentDay}',
                               style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -251,7 +325,7 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                                 ),
                                 const SizedBox(width: 5),
                                 Text(
-                                  widget.crop.healthStatus,
+                                  currentCrop.healthStatus,
                                   style: const TextStyle(color: Color(0xFF21583E), fontSize: 10, fontWeight: FontWeight.bold),
                                 ),
                               ],
@@ -271,7 +345,7 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.between,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -283,8 +357,18 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(color: const Color(0xFFE9F3DF), borderRadius: BorderRadius.circular(20)),
-                          child: const Text('1/2', style: TextStyle(color: Color(0xFF196B4A), fontSize: 11, fontWeight: FontWeight.bold)),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE9F3DF),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            '$completedTasks/$totalTasks',
+                            style: const TextStyle(
+                              color: Color(0xFF196B4A),
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -292,16 +376,13 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                     ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: widget.crop.tasks.length,
+                      itemCount: currentCrop.tasks.length,
                       separatorBuilder: (context, index) => const SizedBox(height: 10),
                       itemBuilder: (context, index) {
-                        final task = widget.crop.tasks[index];
+                        final task = currentCrop.tasks[index];
                         return InkWell(
                           onTap: () {
-                            setState(() {
-                              task.isCompleted = !task.isCompleted;
-                              task.subtitle = task.isCompleted ? 'Selesai' : 'Belum selesai';
-                            });
+                            context.read<CropProvider>().toggleTask(currentCrop.id, index);
                           },
                           borderRadius: BorderRadius.circular(15),
                           child: Container(
@@ -377,12 +458,12 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
-                                Text('Tips ahli hari ini', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF526921))),
-                                SizedBox(height: 4),
+                              children: [
+                                const Text('Tips ahli hari ini', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF526921))),
+                                const SizedBox(height: 4),
                                 Text(
-                                  'Pertahankan pH nutrisi sekitar 5,5 - 6,5 agar penyerapan akar pakcoy optimal.',
-                                  style: TextStyle(fontSize: 11.5, color: Color(0xFF697255), height: 1.4),
+                                  _getExpertTip(currentCrop.name),
+                                  style: const TextStyle(fontSize: 11.5, color: Color(0xFF697255), height: 1.4),
                                 ),
                               ],
                             ),
@@ -420,3 +501,4 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
     );
   }
 }
+

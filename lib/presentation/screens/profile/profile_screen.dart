@@ -5,236 +5,291 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final canPop = Navigator.canPop(context);
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      child: Column(
-        children: [
-          // Profile Card Header
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: colorScheme.outlineVariant),
+    return Scaffold(
+      backgroundColor: const Color(0xFFFAFBF7),
+      appBar: AppBar(
+        title: const Text('Profil Petani'),
+        centerTitle: false,
+        leading: canPop
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1.0),
+          child: Container(
+            color: const Color(0xFFE2E8E3),
+            height: 1.0,
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        child: Column(
+          children: [
+            // Header Profile Card
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(22),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: const Color(0xFFE2E8E3)),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF1E3B2E).withValues(alpha: 0.04),
+                    blurRadius: 16,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  CircleAvatar(
+                    radius: 40,
+                    backgroundColor: const Color(0xFF104B36),
+                    child: const Text(
+                      'PU',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  const Text(
+                    'Luna Teguh',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF17352B),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Penggiat Urban Farming & Hidroponik',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF72827C),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEAF3E7),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(Icons.verified, size: 14, color: Color(0xFF196B4A)),
+                        SizedBox(width: 6),
+                        Text(
+                          'Petani Urban Aktif • Rooftop Bandung',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF196B4A),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-            child: Column(
+            const SizedBox(height: 22),
+
+            // Statistics Grid
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'STATISTIK PERKEBUNAN',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.0,
+                  color: const Color(0xFF72827C),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
               children: [
-                CircleAvatar(
-                  radius: 36,
-                  backgroundColor: colorScheme.primary,
-                  child: Text(
-                    'LT',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: colorScheme.onPrimary,
-                      letterSpacing: 1.0,
-                    ),
+                Expanded(
+                  child: _buildStatTile(
+                    title: 'Total Panen',
+                    value: '28.5 kg',
+                    icon: Icons.eco_rounded,
                   ),
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  'Luna Teguh',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'NIM: 2210511048  •  Teknik Komputer',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    'Kepala Divisi Pengembangan IT',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.onPrimaryContainer,
-                    ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _buildStatTile(
+                    title: 'Tanaman Aktif',
+                    value: '3 Ragam',
+                    icon: Icons.yard_outlined,
                   ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: 20),
-
-          // Detail Info Group
-          _buildSectionHeader(context, 'INFORMASI AKADEMIK & ORGANISASI'),
-          const SizedBox(height: 10),
-          _buildInfoContainer(
-            context,
-            items: [
-              _InfoRow(label: 'Surel Institusi', value: 'luna.teguh@himtec.org'),
-              _InfoRow(label: 'Angkatan', value: '2023'),
-              _InfoRow(label: 'Fakultas', value: 'Ilmu Komputer'),
-              _InfoRow(label: 'Status Keanggotaan', value: 'Pengurus Harian Aktif'),
-            ],
-          ),
-          const SizedBox(height: 20),
-
-          // Activity Stats
-          _buildSectionHeader(context, 'PENCAPAIAN PROGRAM KERJA'),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatBox(
-                  context,
-                  title: 'Presensi Rapat',
-                  value: '94%',
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildStatTile(
+                    title: 'Tingkat Sukses',
+                    value: '94%',
+                    icon: Icons.trending_up_rounded,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _buildStatBox(
-                  context,
-                  title: 'Proyek Selesai',
-                  value: '12',
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _buildStatTile(
+                    title: 'Lama Bertani',
+                    value: '180 Hari',
+                    icon: Icons.calendar_today_rounded,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _buildStatBox(
-                  context,
-                  title: 'Poin SKP',
-                  value: '185',
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          // Action Button
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.edit_outlined, size: 18),
-              label: const Text('Perbarui Data Profil'),
+              ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
+            const SizedBox(height: 24),
 
-  Widget _buildSectionHeader(BuildContext context, String title) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.8,
-          color: colorScheme.onSurfaceVariant,
+            // Spesifikasi Kebun
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'SPESIFIKASI INSTALASI KEBUN',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.0,
+                  color: const Color(0xFF72827C),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFFE2E8E3)),
+              ),
+              child: Column(
+                children: [
+                  _buildSpecRow('Metode Utama', 'Hidroponik NFT & Dutch Bucket'),
+                  const Divider(height: 1),
+                  _buildSpecRow('Kapasitas Tanam', '120 Lubang Tanam'),
+                  const Divider(height: 1),
+                  _buildSpecRow('Nutrisi Digunakan', 'AB Mix Formulasi Sayur Daun'),
+                  const Divider(height: 1),
+                  _buildSpecRow('Sensor Otomasi', 'ESP32 pH & TDS Monitor Aktif'),
+                  const Divider(height: 1),
+                  _buildSpecRow('Lokasi', 'Coblong, Kota Bandung'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Actions Menu
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Form pengeditan data kebun dibuka.'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  side: const BorderSide(color: Color(0xFFDFE6DA)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  backgroundColor: Colors.white,
+                ),
+                icon: const Icon(Icons.edit_outlined, size: 18, color: Color(0xFF196B4A)),
+                label: const Text(
+                  'Ubah Profil & Data Kebun',
+                  style: TextStyle(color: Color(0xFF196B4A), fontWeight: FontWeight.w700),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoContainer(BuildContext context, {required List<_InfoRow> items}) {
-    final colorScheme = Theme.of(context).colorScheme;
-
+  Widget _buildStatTile({
+    required String title,
+    required String value,
+    required IconData icon,
+  }) {
     return Container(
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: colorScheme.outlineVariant),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8E3)),
       ),
       child: Column(
-        children: items.asMap().entries.map((entry) {
-          final isLast = entry.key == items.length - 1;
-          final item = entry.value;
-
-          return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      item.label,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    Text(
-                      item.value,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                  ],
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF72827C),
                 ),
               ),
-              if (!isLast) const Divider(),
+              Icon(icon, size: 16, color: const Color(0xFF196B4A)),
             ],
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildStatBox(BuildContext context, {required String title, required String value}) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: colorScheme.outlineVariant),
-      ),
-      child: Column(
-        children: [
+          ),
+          const SizedBox(height: 8),
           Text(
             value,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: colorScheme.primary,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 11,
-              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF17352B),
             ),
           ),
         ],
       ),
     );
   }
+
+  Widget _buildSpecRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(fontSize: 12, color: Color(0xFF72827C)),
+          ),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF17352B)),
+          ),
+        ],
+      ),
+    );
+  }
 }
-
-class _InfoRow {
-  final String label;
-  final String value;
-
-  _InfoRow({required this.label, required this.value});
-}
-

@@ -20,15 +20,15 @@ class MainWrapper extends StatelessWidget {
   String _getTitleForIndex(int index) {
     switch (index) {
       case 0:
-        return 'Beranda';
+        return 'Beranda Kebun';
       case 1:
-        return 'Eksplorasi';
+        return 'Hama & Rawat';
       case 2:
-        return 'Notifikasi';
+        return 'Pasar & Hitung';
       case 3:
-        return 'Profil Pengurus';
+        return 'Profil Petani';
       default:
-        return 'HIMTEC Mobile';
+        return 'AGL (Applied Agriculture & Livestock)';
     }
   }
 
@@ -37,9 +37,9 @@ class MainWrapper extends StatelessWidget {
       case 0:
         return [
           IconButton(
-            icon: const Icon(Icons.search_rounded, size: 22),
-            tooltip: 'Pencarian',
-            onPressed: () => navigationShell.goBranch(1),
+            icon: const Icon(Icons.document_scanner_outlined, size: 22),
+            tooltip: 'Pindai Penyakit Daun (AI)',
+            onPressed: () => context.push('/scan'),
           ),
           IconButton(
             icon: const Icon(Icons.notifications_outlined, size: 22),
@@ -51,9 +51,9 @@ class MainWrapper extends StatelessWidget {
       case 1:
         return [
           IconButton(
-            icon: const Icon(Icons.tune_rounded, size: 22),
-            tooltip: 'Filter Pencarian',
-            onPressed: () {},
+            icon: const Icon(Icons.document_scanner_outlined, size: 22),
+            tooltip: 'Pindai Penyakit Daun (AI)',
+            onPressed: () => context.push('/scan'),
           ),
           const SizedBox(width: 4),
         ];
@@ -77,7 +77,7 @@ class MainWrapper extends StatelessWidget {
         return [
           IconButton(
             icon: const Icon(Icons.qr_code_rounded, size: 22),
-            tooltip: 'Kartu Tanda Anggota Digital',
+            tooltip: 'Kartu Petani Digital',
             onPressed: () {
               _showQrDialog(context);
             },
@@ -96,7 +96,7 @@ class MainWrapper extends StatelessWidget {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: const Text(
-          'Identitas Digital Anggota',
+          'Identitas Petani Digital',
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
         ),
         content: Column(
@@ -120,7 +120,7 @@ class MainWrapper extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'NIM: 2210511048',
+              'ID Anggota: AGL-2210511048',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -128,7 +128,7 @@ class MainWrapper extends StatelessWidget {
               ),
             ),
             Text(
-              'Gunakan kode ini untuk presensi rapat dan kegiatan',
+              'Gunakan kode ini untuk verifikasi panen & kegiatan komunitas AGL',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 11,
@@ -195,14 +195,14 @@ class MainWrapper extends StatelessWidget {
               label: 'Beranda',
             ),
             NavigationDestination(
-              icon: Icon(Icons.explore_outlined),
-              selectedIcon: Icon(Icons.explore_rounded),
-              label: 'Eksplor',
+              icon: Icon(Icons.pest_control_outlined),
+              selectedIcon: Icon(Icons.pest_control_rounded),
+              label: 'Hama & Rawat',
             ),
             NavigationDestination(
-              icon: Icon(Icons.notifications_none_rounded),
-              selectedIcon: Icon(Icons.notifications_rounded),
-              label: 'Notifikasi',
+              icon: Icon(Icons.bar_chart_outlined),
+              selectedIcon: Icon(Icons.bar_chart_rounded),
+              label: 'Pasar & Hitung',
             ),
             NavigationDestination(
               icon: Icon(Icons.person_outline_rounded),

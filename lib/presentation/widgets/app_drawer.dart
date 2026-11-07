@@ -134,10 +134,10 @@ class AppDrawer extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'Anggota Aktif',
+                  'Petani Aktif',
                   style: TextStyle(
                     fontSize: 11,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                     color: colorScheme.primary,
                   ),
                 ),
@@ -156,7 +156,7 @@ class AppDrawer extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            'luna.teguh@himtec.org',
+            'luna.teguh@agl.id',
             style: TextStyle(
               fontSize: 13,
               color: colorScheme.onSurfaceVariant,
@@ -175,9 +175,29 @@ class AppDrawer extends StatelessWidget {
         bottom: MediaQuery.of(context).padding.bottom + 12,
         top: 12,
       ),
-      child: Text(
-        'HIMTEC Mobile v1.0.0',
-        style: TextStyle(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'AGL Mobile v1.0.0',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            'Applied Agriculture & Livestock',
+            style: TextStyle(
+              fontSize: 10,
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
           fontSize: 11,
           color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
           fontWeight: FontWeight.w500,

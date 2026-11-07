@@ -33,28 +33,35 @@ class HelpScreen extends StatelessWidget {
           const SizedBox(height: 10),
           _buildFaqItem(
             context,
-            question: 'Bagaimana cara memvalidasi presensi kehadiran acara?',
+            question: 'Bagaimana cara menentukan fase dan jadwal pemupukan tanaman?',
             answer:
-                'Buka menu Presensi di beranda, lalu arahkan kamera ke kode QR dinamis yang ditampilkan oleh panitia saat kegiatan berlangsung.',
+                'Anda dapat memantau umur tanaman di kartu Beranda atau membuka Detail Tanaman. Sistem menyediakan tips pakar kontekstual dan checklist perawatan harian sesuai fase pertumbuhan.',
           ),
           const SizedBox(height: 8),
           _buildFaqItem(
             context,
-            question: 'Bagaimana prosedur pengajuan anggaran kegiatan divisi?',
+            question: 'Bagaimana penanganan darurat saat tanaman diserang hama/penyakit?',
             answer:
-                'Pengajuan anggaran dilakukan melalui modul Kas dengan mengunggah proposal kegiatan paling lambat 14 hari sebelum hari pelaksanaan acara.',
+                'Buka tab "Hama & Rawat", cari hama berdasarkan ciri visual atau tanaman terdampak (misal wereng, patek, ulat), lalu terapkan solusi agens hayati nabati yang direkomendasikan.',
           ),
           const SizedBox(height: 8),
           _buildFaqItem(
             context,
-            question: 'Siapa yang dapat mengakses repositori riset himpunan?',
+            question: 'Bagaimana cara menghitung proyeksi panen dan laba bersih?',
             answer:
-                'Seluruh anggota aktif dengan status terdaftar dapat mengunduh materi dan berkas riset melalui tab Eksplor.',
+                'Gunakan tab "Pasar & Hitung". Pilih komoditas Anda atau masukkan jumlah rumpun/lubang tanam, bobot panen, dan modal operasional untuk melihat proyeksi laba dengan memperhitungkan tingkat keberhasilan (success rate).',
+          ),
+          const SizedBox(height: 8),
+          _buildFaqItem(
+            context,
+            question: 'Apakah aplikasi mendukung budidaya pertanian dan peternakan sekaligus?',
+            answer:
+                'Ya, AGL (Applied Agriculture & Livestock) mendukung multisistem budidaya terapan, mulai dari komoditas tanaman sawah pangan, hortikultura, hingga peternakan ayam, sapi, dan perah dengan acuan harga pasar per kota.',
           ),
           const SizedBox(height: 24),
 
           Text(
-            'SALURAN DUKUNGAN RESMI',
+            'SALURAN DUKUNGAN RESMI AGL',
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
@@ -74,23 +81,23 @@ class HelpScreen extends StatelessWidget {
               children: [
                 _buildContactRow(
                   context,
-                  icon: Icons.alternate_email_rounded,
-                  label: 'Sekretariat Utama',
-                  value: 'sekretariat@himtec.org',
+                  icon: Icons.eco_outlined,
+                  label: 'Konsultasi Agronomi & Budidaya',
+                  value: 'agronomi@agl.id',
                 ),
                 const Divider(height: 24),
                 _buildContactRow(
                   context,
-                  icon: Icons.chat_outlined,
-                  label: 'Helpdesk Divisi IT',
-                  value: 'support@himtec.org',
+                  icon: Icons.pets_outlined,
+                  label: 'Konsultasi Peternakan (Livestock)',
+                  value: 'livestock@agl.id',
                 ),
                 const Divider(height: 24),
                 _buildContactRow(
                   context,
                   icon: Icons.location_on_outlined,
-                  label: 'Ruang Himpunan',
-                  value: 'Gedung Teknik Lt. 2, Ruang 204',
+                  label: 'Pusat Riset Terapan AGL',
+                  value: 'Kawasan Riset Terpadu AGL Indonesia',
                 ),
               ],
             ),
