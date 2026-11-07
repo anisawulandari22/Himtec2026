@@ -32,8 +32,10 @@ jobs:
       - name: Verify Flutter Installation
         run: flutter --version
 
-      - name: Scaffold Official Android Platform Files
-        run: flutter create . --platforms=android --org=org.himtec --project-name=himtec_app
+      - name: Clean & Generate Official Android Platform
+        run: |
+          rm -rf android
+          flutter create . --platforms=android --org=org.himtec --project-name=himtec_app
 
       - name: Get Dependencies
         run: flutter pub get
@@ -45,7 +47,7 @@ jobs:
         run: flutter test
 
       - name: Build Android APK
-        run: flutter build apk --release --verbose
+        run: flutter build apk --release
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
