@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -57,89 +58,149 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildEntityImage(
+    String imagePath, {
+    required double width,
+    required double height,
+    required IconData fallbackIcon,
+  }) {
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return Image.network(
+        imagePath,
+        width: width,
+        height: height,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Container(
+          width: width,
+          height: height,
+          color: const Color(0xFFEAF3E7),
+          child: Icon(fallbackIcon, color: const Color(0xFF196B4A)),
+        ),
+      );
+    }
+    final file = File(imagePath);
+    if (file.existsSync()) {
+      return Image.file(
+        file,
+        width: width,
+        height: height,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Container(
+          width: width,
+          height: height,
+          color: const Color(0xFFEAF3E7),
+          child: Icon(fallbackIcon, color: const Color(0xFF196B4A)),
+        ),
+      );
+    }
+    return Container(
+      width: width,
+      height: height,
+      color: const Color(0xFFEAF3E7),
+      child: Icon(fallbackIcon, color: const Color(0xFF196B4A)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final cropProvider = context.watch<CropProvider>();
     final livestockProvider = context.watch<LivestockProvider>();
     final filteredCrops = cropProvider.filterByType(_cropTypes[_selectedTypeIndex]);
     final filteredLivestock = livestockProvider.filterByCategory(_livestockTypes[_selectedLivestockTypeIndex]);
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Greeting & Avatar
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF196B4A),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.eco_rounded, color: Colors.white, size: 24),
-                  ),
-                  const SizedBox(width: 12),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'AGL • AGRICULTURE & LIVESTOCK',
-                        style: TextStyle(
-                          color: Color(0xFF196B4A),
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.0,
+    return SafeArea(
+      bottom: false,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header Greeting & Quick Actions
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Builder(
+                      builder: (scaffoldContext) => InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () => Scaffold.of(scaffoldContext).openDrawer(),
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF196B4A),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(Icons.menu_rounded, color: Colors.white, size: 24),
                         ),
                       ),
-                      SizedBox(height: 2),
-                      Text(
-                        'Halo, Praktisi AGL!',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF17352B),
-                          letterSpacing: -0.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ProfileScreen(),
                     ),
-                  );
-                },
-                borderRadius: BorderRadius.circular(22),
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    border: Border.all(color: const Color(0xFFDFE6DA)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF2C4C36).withValues(alpha: 0.08),
-                        blurRadius: 14,
-                        offset: const Offset(0, 5),
-                      )
-                    ],
-                  ),
-                  child: const Icon(Icons.person_outline_rounded, color: Color(0xFF196B4A), size: 22),
+                    const SizedBox(width: 12),
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'AGL • AGRICULTURE & LIVESTOCK',
+                          style: TextStyle(
+                            color: Color(0xFF196B4A),
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Halo, Praktisi AGL!',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF17352B),
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.document_scanner_outlined, color: Color(0xFF196B4A), size: 22),
+                      tooltip: 'Pindai Penyakit (AI)',
+                      onPressed: () => context.push('/scan'),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProfileScreen(),
+                          ),
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(22),
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          border: Border.all(color: const Color(0xFFDFE6DA)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF2C4C36).withValues(alpha: 0.08),
+                              blurRadius: 14,
+                              offset: const Offset(0, 5),
+                            )
+                          ],
+                        ),
+                        child: const Icon(Icons.person_outline_rounded, color: Color(0xFF196B4A), size: 20),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           const SizedBox(height: 20),
 
           // Weather Card
@@ -575,17 +636,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
+                            child: _buildEntityImage(
                               crop.imagePath,
                               width: 76,
                               height: 76,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => Container(
-                                width: 76,
-                                height: 76,
-                                color: const Color(0xFFEAF3E7),
-                                child: const Icon(Icons.eco_outlined, color: Color(0xFF196B4A)),
-                              ),
+                              fallbackIcon: Icons.eco_outlined,
                             ),
                           ),
                           const SizedBox(width: 14),
@@ -794,17 +849,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
+                            child: _buildEntityImage(
                               animal.imagePath,
                               width: 82,
                               height: 82,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => Container(
-                                width: 82,
-                                height: 82,
-                                color: const Color(0xFFEAF3E7),
-                                child: const Icon(Icons.pets_rounded, color: Color(0xFF196B4A)),
-                              ),
+                              fallbackIcon: Icons.pets_rounded,
                             ),
                           ),
                           const SizedBox(width: 14),
@@ -881,7 +930,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ],
       ),
-    );
+    ),
+  );
   }
 }
 

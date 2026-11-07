@@ -84,7 +84,7 @@ class ScanResultSheet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'HASIL DIAGNOSA GEMINI AI',
+                      'HASIL DIAGNOSA ${result.aiEngine.toUpperCase()}',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,

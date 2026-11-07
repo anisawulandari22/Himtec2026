@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/crop_provider.dart';
 import '../../../models/crop_model.dart';
@@ -17,7 +19,10 @@ class _AddCropBottomSheetState extends State<AddCropBottomSheet> {
   final _nameController = TextEditingController();
   final _categoryController = TextEditingController(text: 'Fase pindah tanam');
   final _totalDaysController = TextEditingController(text: '30');
+  final ImagePicker _picker = ImagePicker();
+
   String _selectedImage = 'https://images.unsplash.com/photo-1594282484620-df6495d46101?w=300';
+  String? _customImagePath;
   String _initialTask = 'Pemberian pupuk dan nutrisi awal';
 
   final List<Map<String, dynamic>> _cropPresets = [
@@ -70,9 +75,37 @@ class _AddCropBottomSheetState extends State<AddCropBottomSheet> {
       _nameController.text = preset['name'];
       _categoryController.text = preset['phase'];
       _totalDaysController.text = preset['days'].toString();
-      _selectedImage = preset['image'];
+      if (_customImagePath == null) {
+        _selectedImage = preset['image'];
+      }
       _initialTask = preset['task'];
     });
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final XFile? file = await _picker.pickImage(
+        source: source,
+        maxWidth: 1200,
+        maxHeight: 1200,
+        imageQuality: 85,
+      );
+      if (file != null) {
+        setState(() {
+          _customImagePath = file.path;
+          _selectedImage = file.path;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal memilih gambar: ${e.toString()}'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -85,11 +118,12 @@ class _AddCropBottomSheetState extends State<AddCropBottomSheet> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
+      final imageToSave = _customImagePath ?? _selectedImage;
       final newCrop = CropModel(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: _nameController.text.trim(),
         category: _categoryController.text.trim(),
-        imagePath: _selectedImage,
+        imagePath: imageToSave,
         currentDay: 1,
         totalDays: int.tryParse(_totalDaysController.text.trim()) ?? 30,
         progressPercent: 5,
@@ -121,115 +155,220 @@ class _AddCropBottomSheetState extends State<AddCropBottomSheet> {
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Container(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.88,
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
         decoration: BoxDecoration(
           color: colorScheme.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: colorScheme.outlineVariant,
-                    borderRadius: BorderRadius.circular(2),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: colorScheme.outlineVariant,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Tambah Tanaman Baru',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: colorScheme.onSurface,
+                const SizedBox(height: 16),
+                Text(
+                  'Tambah Tanaman Baru',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: colorScheme.onSurface,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              // Preset Cepat Komoditas Nusantara
-              Text(
-                'PILIH TEMPLATE TANAMAN CEPAT',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  color: colorScheme.onSurfaceVariant,
-                  letterSpacing: 1.0,
-                ),
-              ),
-              const SizedBox(height: 8),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: _cropPresets.map((preset) {
-                    final isSelected = _nameController.text == preset['name'];
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ActionChip(
-                        label: Text(preset['name']),
-                        backgroundColor: isSelected ? const Color(0xFFEAF3E7) : colorScheme.surfaceContainerLow,
-                        side: BorderSide(
-                          color: isSelected ? const Color(0xFF196B4A) : colorScheme.outlineVariant,
+                const SizedBox(height: 12),
+
+                // Input & Pratinjau Foto Tanaman
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: colorScheme.outlineVariant),
+                  ),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          width: 72,
+                          height: 72,
+                          color: const Color(0xFFEAF3E7),
+                          child: _customImagePath != null && File(_customImagePath!).existsSync()
+                              ? Image.file(
+                                  File(_customImagePath!),
+                                  width: 72,
+                                  height: 72,
+                                  fit: BoxFit.cover,
+                                )
+                              : (_selectedImage.startsWith('http')
+                                  ? Image.network(
+                                      _selectedImage,
+                                      width: 72,
+                                      height: 72,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (ctx, err, stack) => const Icon(
+                                        Icons.eco_rounded,
+                                        color: Color(0xFF196B4A),
+                                        size: 32,
+                                      ),
+                                    )
+                                  : const Icon(
+                                      Icons.eco_rounded,
+                                      color: Color(0xFF196B4A),
+                                      size: 32,
+                                    )),
                         ),
-                        labelStyle: TextStyle(
-                          fontSize: 11,
-                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                          color: isSelected ? const Color(0xFF196B4A) : colorScheme.onSurface,
-                        ),
-                        onPressed: () => _selectPreset(preset),
                       ),
-                    );
-                  }).toList(),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _customImagePath != null ? 'Foto Tanaman Terpilih' : 'Unggah Foto Tanaman',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF17352B),
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              _customImagePath != null ? 'File lokal tersimpan' : 'Ambil dari kamera atau galeri',
+                              style: const TextStyle(fontSize: 10.5, color: Color(0xFF72827C)),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                OutlinedButton.icon(
+                                  onPressed: () => _pickImage(ImageSource.camera),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    visualDensity: VisualDensity.compact,
+                                    side: const BorderSide(color: Color(0xFF196B4A)),
+                                  ),
+                                  icon: const Icon(Icons.camera_alt_outlined, size: 14, color: Color(0xFF196B4A)),
+                                  label: const Text(
+                                    'Kamera',
+                                    style: TextStyle(fontSize: 11, color: Color(0xFF196B4A), fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                OutlinedButton.icon(
+                                  onPressed: () => _pickImage(ImageSource.gallery),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    visualDensity: VisualDensity.compact,
+                                    side: const BorderSide(color: Color(0xFF72827C)),
+                                  ),
+                                  icon: const Icon(Icons.photo_library_outlined, size: 14, color: Color(0xFF56625D)),
+                                  label: const Text(
+                                    'Galeri',
+                                    style: TextStyle(fontSize: 11, color: Color(0xFF56625D), fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 14),
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nama Tanaman',
-                  hintText: 'Misal: Padi Inpari 32 / Cabai Rawit',
-                  prefixIcon: Icon(Icons.eco_outlined),
+                const SizedBox(height: 14),
+
+                // Preset Cepat Komoditas Nusantara
+                Text(
+                  'ATAU PILIH TEMPLATE TANAMAN CEPAT',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: colorScheme.onSurfaceVariant,
+                    letterSpacing: 1.0,
+                  ),
                 ),
-                validator: (val) =>
-                    (val == null || val.trim().isEmpty) ? 'Nama tanaman wajib diisi' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _categoryController,
-                decoration: const InputDecoration(
-                  labelText: 'Fase Pertumbuhan',
-                  hintText: 'Misal: Fase vegetatif / anakan',
-                  prefixIcon: Icon(Icons.category_outlined),
+                const SizedBox(height: 8),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: _cropPresets.map((preset) {
+                      final isSelected = _nameController.text == preset['name'];
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: ActionChip(
+                          label: Text(preset['name']),
+                          backgroundColor: isSelected ? const Color(0xFFEAF3E7) : colorScheme.surfaceContainerLow,
+                          side: BorderSide(
+                            color: isSelected ? const Color(0xFF196B4A) : colorScheme.outlineVariant,
+                          ),
+                          labelStyle: TextStyle(
+                            fontSize: 11,
+                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                            color: isSelected ? const Color(0xFF196B4A) : colorScheme.onSurface,
+                          ),
+                          onPressed: () => _selectPreset(preset),
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _totalDaysController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Estimasi Masa Tanam (Hari)',
-                  hintText: '115',
-                  prefixIcon: Icon(Icons.calendar_today_outlined),
+                const SizedBox(height: 14),
+                TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nama Tanaman',
+                    hintText: 'Misal: Padi Inpari 32 / Cabai Rawit',
+                    prefixIcon: Icon(Icons.eco_outlined),
+                  ),
+                  validator: (val) =>
+                      (val == null || val.trim().isEmpty) ? 'Nama tanaman wajib diisi' : null,
                 ),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _submit,
-                  child: const Text('Simpan ke Kebun / Sawah'),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _categoryController,
+                  decoration: const InputDecoration(
+                    labelText: 'Fase Pertumbuhan',
+                    hintText: 'Misal: Fase vegetatif / anakan',
+                    prefixIcon: Icon(Icons.category_outlined),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _totalDaysController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Estimasi Masa Tanam (Hari)',
+                    hintText: '115',
+                    prefixIcon: Icon(Icons.calendar_today_outlined),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _submit,
+                    child: const Text('Simpan ke Kebun / Sawah'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 }
-

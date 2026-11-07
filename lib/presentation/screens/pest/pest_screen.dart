@@ -152,18 +152,63 @@ class _PestScreenState extends State<PestScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAFBF7),
-      appBar: AppBar(
-        title: const Text('Hama & Penyakit (AGL)'),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: const Color(0xFFE2E8E3), height: 1.0),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      body: SafeArea(
+        bottom: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header Judul Halaman
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF196B4A),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(Icons.pest_control_rounded, color: Colors.white, size: 24),
+                      ),
+                      const SizedBox(width: 12),
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'KATALOG & DIAGNOSA AGL',
+                            style: TextStyle(
+                              color: Color(0xFF196B4A),
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'Hama & Penyakit',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF17352B),
+                              letterSpacing: -0.3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.document_scanner_outlined, color: Color(0xFF196B4A), size: 24),
+                    tooltip: 'Pindai AI',
+                    onPressed: () => context.push('/scan'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
             // 1. Selector Sektor: Tanaman vs Ternak
             Container(
               padding: const EdgeInsets.all(4),
@@ -799,6 +844,7 @@ class _PestScreenState extends State<PestScreen> {
           ),
         ],
       ),
-    );
+    ),
+  );
   }
 }

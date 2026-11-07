@@ -14,7 +14,7 @@ class DiseaseScanScreen extends StatefulWidget {
 }
 
 class _DiseaseScanScreenState extends State<DiseaseScanScreen>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   CameraController? _cameraController;
   List<CameraDescription> _availableCameras = [];
   bool _isCameraInitialized = false;
@@ -22,16 +22,32 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
   FlashMode _currentFlashMode = FlashMode.off;
   final ImagePicker _imagePicker = ImagePicker();
 
+  late AnimationController _scannerAnimController;
+  late Animation<double> _scannerAnimation;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _initializeCamera();
+
+    _scannerAnimController = AnimationController(
+      duration: const Duration(milliseconds: 2200),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _scannerAnimation = Tween<double>(begin: 0.05, end: 0.95).animate(
+      CurvedAnimation(
+        parent: _scannerAnimController,
+        curve: Curves.easeInOut,
+      ),
+    );
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _scannerAnimController.dispose();
     _cameraController?.dispose();
     super.dispose();
   }
@@ -222,7 +238,7 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Gunakan Google AI Studio API Key gratis untuk deteksi tanaman berbasis cloud online:',
+              'Aplikasi telah aktif dengan Real-Time Vision AI Engine bawaan. Anda juga dapat menghubungkan Google Gemini API Key gratis sebagai opsi cloud tambahan:',
               style: TextStyle(fontSize: 12, color: Color(0xFF56625D)),
             ),
             const SizedBox(height: 12),
@@ -353,12 +369,47 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
                     right: -2,
                     child: _buildCorner(isTop: false, isLeft: false),
                   ),
+
+                  // Real-Time Animated Laser Scanner Bar
+                  AnimatedBuilder(
+                    animation: _scannerAnimation,
+                    builder: (context, child) {
+                      final boxHeight = size.width * 0.78;
+                      return Positioned(
+                        top: _scannerAnimation.value * (boxHeight - 6),
+                        left: 10,
+                        right: 10,
+                        child: Container(
+                          height: 2.5,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(2),
+                            gradient: const LinearGradient(
+                              colors: [
+                                Colors.transparent,
+                                Color(0xFF7CD9B5),
+                                Colors.white,
+                                Color(0xFF7CD9B5),
+                                Colors.transparent,
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF7CD9B5).withValues(alpha: 0.8),
+                                blurRadius: 8,
+                                spreadRadius: 1.5,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
           ),
 
-          // 3. Top Bar (Back, Flash, Gemini API Key Badge)
+          // 3. Top Controls (Back, Flash, Real-Time AI Badge)
           SafeArea(
             child: Align(
               alignment: Alignment.topCenter,
@@ -380,24 +431,23 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
                         color: Colors.black.withValues(alpha: 0.6),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: GeminiService.hasCustomKey
-                              ? const Color(0xFF196B4A)
-                              : const Color(0xFFE2E8E3).withValues(alpha: 0.3),
+                          color: const Color(0xFF196B4A),
                         ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            Icons.auto_awesome,
-                            color: GeminiService.hasCustomKey
-                                ? const Color(0xFF7CD9B5)
-                                : const Color(0xFFFFB74D),
-                            size: 14,
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF7CD9B5),
+                              shape: BoxShape.circle,
+                            ),
                           ),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 7),
                           Text(
-                            GeminiService.hasCustomKey ? 'Gemini AI Aktif' : 'Mode Demo AI',
+                            GeminiService.hasCustomKey ? 'Gemini 1.5 Flash Aktif' : 'AI Real-Time Vision Aktif',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 11,

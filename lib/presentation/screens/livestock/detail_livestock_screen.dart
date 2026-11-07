@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/livestock_provider.dart';
@@ -116,6 +117,17 @@ class _DetailLivestockScreenState extends State<DetailLivestockScreen> {
     );
   }
 
+  ImageProvider _getImageProvider(String path) {
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return NetworkImage(path);
+    }
+    final file = File(path);
+    if (file.existsSync()) {
+      return FileImage(file);
+    }
+    return const NetworkImage('https://images.unsplash.com/photo-1546445317-29f4545e9d53?w=400');
+  }
+
   @override
   Widget build(BuildContext context) {
     final livestockProvider = context.watch<LivestockProvider>();
@@ -186,7 +198,7 @@ class _DetailLivestockScreenState extends State<DetailLivestockScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(24),
                   image: DecorationImage(
-                    image: NetworkImage(item.imagePath),
+                    image: _getImageProvider(item.imagePath),
                     fit: BoxFit.cover,
                   ),
                 ),

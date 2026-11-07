@@ -366,18 +366,58 @@ class _MarketScreenState extends State<MarketScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAFBF7),
-      appBar: AppBar(
-        title: const Text('Pasar & Kalkulator Hasil'),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: const Color(0xFFE2E8E3), height: 1.0),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      body: SafeArea(
+        bottom: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header Judul Halaman
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF196B4A),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(Icons.storefront_rounded, color: Colors.white, size: 24),
+                      ),
+                      const SizedBox(width: 12),
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'BURSA KOMODITAS REAL-TIME',
+                            style: TextStyle(
+                              color: Color(0xFF196B4A),
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'Pasar & Kalkulator Hasil',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF17352B),
+                              letterSpacing: -0.3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
             // 1. Selector Kota Interaktif Real-Time
             Container(
               padding: const EdgeInsets.all(14),
@@ -1217,7 +1257,8 @@ class _MarketScreenState extends State<MarketScreen> {
           ),
         ],
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildInputField({

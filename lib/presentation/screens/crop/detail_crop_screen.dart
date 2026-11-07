@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/crop_provider.dart';
@@ -213,6 +214,17 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
     );
   }
 
+  ImageProvider _getImageProvider(String path) {
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return NetworkImage(path);
+    }
+    final file = File(path);
+    if (file.existsSync()) {
+      return FileImage(file);
+    }
+    return const NetworkImage('https://images.unsplash.com/photo-1594282484620-df6495d46101?w=300');
+  }
+
   @override
   Widget build(BuildContext context) {
     final cropProvider = context.watch<CropProvider>();
@@ -267,7 +279,7 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(26),
                   image: DecorationImage(
-                    image: NetworkImage(currentCrop.imagePath),
+                    image: _getImageProvider(currentCrop.imagePath),
                     fit: BoxFit.cover,
                   ),
                 ),

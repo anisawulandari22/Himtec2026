@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/livestock_provider.dart';
 import '../../../models/livestock_model.dart';
@@ -25,6 +27,34 @@ class _AddLivestockBottomSheetState extends State<AddLivestockBottomSheet> {
   String _selectedCategory = 'Sapi Potong';
   String _selectedGender = 'Jantan';
   String _selectedImage = 'https://images.unsplash.com/photo-1546445317-29f4545e9d53?w=400';
+  String? _customImagePath;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final XFile? file = await _picker.pickImage(
+        source: source,
+        maxWidth: 1200,
+        maxHeight: 1200,
+        imageQuality: 85,
+      );
+      if (file != null) {
+        setState(() {
+          _customImagePath = file.path;
+          _selectedImage = file.path;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal memilih gambar: ${e.toString()}'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
 
   final List<String> _categories = [
     'Sapi Potong',
@@ -102,7 +132,9 @@ class _AddLivestockBottomSheetState extends State<AddLivestockBottomSheet> {
       _forageController.text = preset['forage'].toString();
       _concentrateController.text = preset['concentrate'].toString();
       _waterController.text = preset['water'].toString();
-      _selectedImage = preset['image'];
+      if (_customImagePath == null) {
+        _selectedImage = preset['image'];
+      }
       _tagController.text = 'AGL-${preset['category'].substring(0, 2).toUpperCase()}-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}';
     });
   }
@@ -123,6 +155,7 @@ class _AddLivestockBottomSheetState extends State<AddLivestockBottomSheet> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
+      final imageToSave = _customImagePath ?? _selectedImage;
       final newLivestock = LivestockModel(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         tagNumber: _tagController.text.trim(),
@@ -134,7 +167,7 @@ class _AddLivestockBottomSheetState extends State<AddLivestockBottomSheet> {
         currentWeightKg: double.tryParse(_currentWeightController.text.trim()) ?? 100,
         targetWeightKg: double.tryParse(_targetWeightController.text.trim()) ?? 200,
         healthStatus: 'Sehat',
-        imagePath: _selectedImage,
+        imagePath: imageToSave,
         feedRequirement: FeedRequirement(
           forageKgDaily: double.tryParse(_forageController.text.trim()) ?? 10,
           concentrateKgDaily: double.tryParse(_concentrateController.text.trim()) ?? 2,
@@ -274,6 +307,106 @@ class _AddLivestockBottomSheetState extends State<AddLivestockBottomSheet> {
                               ),
                             );
                           }).toList(),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Input & Pratinjau Foto Ternak
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: colorScheme.surfaceContainerLow,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: colorScheme.outlineVariant),
+                        ),
+                        child: Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                width: 74,
+                                height: 74,
+                                color: const Color(0xFFEAF3E7),
+                                child: _customImagePath != null && File(_customImagePath!).existsSync()
+                                    ? Image.file(
+                                        File(_customImagePath!),
+                                        width: 74,
+                                        height: 74,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : (_selectedImage.startsWith('http')
+                                        ? Image.network(
+                                            _selectedImage,
+                                            width: 74,
+                                            height: 74,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (ctx, err, stack) => const Icon(
+                                              Icons.pets_rounded,
+                                              color: Color(0xFF196B4A),
+                                              size: 32,
+                                            ),
+                                          )
+                                        : const Icon(
+                                            Icons.pets_rounded,
+                                            color: Color(0xFF196B4A),
+                                            size: 32,
+                                          )),
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _customImagePath != null ? 'Foto Ternak Terpilih' : 'Unggah Foto Hewan',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF17352B),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    _customImagePath != null ? 'File foto lokal tersimpan' : 'Ambil dari kamera atau galeri',
+                                    style: const TextStyle(fontSize: 10.5, color: Color(0xFF72827C)),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      OutlinedButton.icon(
+                                        onPressed: () => _pickImage(ImageSource.camera),
+                                        style: OutlinedButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                          visualDensity: VisualDensity.compact,
+                                          side: const BorderSide(color: Color(0xFF196B4A)),
+                                        ),
+                                        icon: const Icon(Icons.camera_alt_outlined, size: 14, color: Color(0xFF196B4A)),
+                                        label: const Text(
+                                          'Kamera',
+                                          style: TextStyle(fontSize: 11, color: Color(0xFF196B4A), fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      OutlinedButton.icon(
+                                        onPressed: () => _pickImage(ImageSource.gallery),
+                                        style: OutlinedButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                          visualDensity: VisualDensity.compact,
+                                          side: const BorderSide(color: Color(0xFF72827C)),
+                                        ),
+                                        icon: const Icon(Icons.photo_library_outlined, size: 14, color: Color(0xFF56625D)),
+                                        label: const Text(
+                                          'Galeri',
+                                          style: TextStyle(fontSize: 11, color: Color(0xFF56625D), fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 16),
