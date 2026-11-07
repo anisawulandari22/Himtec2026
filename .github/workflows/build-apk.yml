@@ -32,14 +32,20 @@ jobs:
       - name: Verify Flutter Installation
         run: flutter --version
 
+      - name: Scaffold Official Android Platform Files
+        run: flutter create . --platforms=android --org=org.himtec --project-name=himtec_app
+
       - name: Get Dependencies
         run: flutter pub get
 
       - name: Analyze Project Code
-        run: flutter analyze --no-fatal-infos
+        run: flutter analyze
+
+      - name: Run Tests
+        run: flutter test
 
       - name: Build Android APK
-        run: flutter build apk --release
+        run: flutter build apk --release --verbose
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
@@ -48,4 +54,3 @@ jobs:
           path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
           retention-days: 14
-
