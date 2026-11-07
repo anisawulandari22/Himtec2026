@@ -369,7 +369,64 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 12),
+
+          // Action Banner: Catatan Perkembangan AGL
+          InkWell(
+            onTap: () => context.push('/progress-records'),
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFFDFE6DA)),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF1E3B2E).withValues(alpha: 0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEAF3E7),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.auto_stories_outlined, color: Color(0xFF196B4A), size: 20),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Catatan Perkembangan Harian',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF17352B),
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Lihat dokumentasi foto & riwayat perkembangan kebun & kandang',
+                          style: TextStyle(fontSize: 11, color: Color(0xFF72827C)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.chevron_right_rounded, color: Color(0xFF72827C), size: 20),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
 
           // Sektor AGL: Pertanian & Peternakan Switcher
           Container(

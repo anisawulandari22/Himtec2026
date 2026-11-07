@@ -13,6 +13,7 @@ import '../../presentation/screens/market/market_screen.dart';
 import '../../presentation/screens/pest/pest_screen.dart';
 import '../../presentation/screens/profile/profile_screen.dart';
 import '../../presentation/screens/scan/disease_scan_screen.dart';
+import '../../presentation/screens/growth/growth_records_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -120,6 +121,11 @@ class AppRouter {
           parentNavigatorKey: _rootNavigatorKey,
           path: '/scan',
           builder: (context, state) => const DiseaseScanScreen(),
+        ),
+        GoRoute(
+          parentNavigatorKey: _rootNavigatorKey,
+          path: '/progress-records',
+          builder: (context, state) => const GrowthRecordsScreen(),
         ),
       ],
     );

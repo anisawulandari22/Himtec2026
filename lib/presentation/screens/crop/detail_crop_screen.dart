@@ -1,9 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/crop_provider.dart';
+import '../../../core/providers/growth_record_provider.dart';
 import '../../../models/crop_model.dart';
+import '../../../models/growth_record_model.dart';
 import 'add_crop_bottom_sheet.dart';
 
 class DetailCropScreen extends StatefulWidget {
@@ -249,6 +252,22 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
+                          final currentCrop = context.read<CropProvider>().getCropById(widget.crop.id) ?? widget.crop;
+                          final newRecord = GrowthRecordModel(
+                            id: DateTime.now().millisecondsSinceEpoch.toString(),
+                            entityId: widget.crop.id,
+                            entityName: currentCrop.name,
+                            entityType: 'Tanaman',
+                            category: currentCrop.category,
+                            note: _journalNoteController.text.trim().isEmpty
+                                ? 'Pencatatan perkembangan harian tanaman di kebun.'
+                                : _journalNoteController.text.trim(),
+                            imagePath: pickedImagePath,
+                            date: DateTime.now(),
+                            extraMetric: 'Hari ke-${currentCrop.currentDay} dari ${currentCrop.totalDays}',
+                          );
+                          context.read<GrowthRecordProvider>().addRecord(newRecord);
+
                           _journalNoteController.clear();
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -629,6 +648,24 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                         label: const Text(
                           'Catat Perkembangan Tanaman',
                           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => context.push('/progress-records'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF104B36),
+                          side: const BorderSide(color: Color(0xFF104B36)),
+                          padding: const EdgeInsets.symmetric(vertical: 13),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        icon: const Icon(Icons.photo_library_outlined, size: 18),
+                        label: const Text(
+                          'Lihat Semua Hasil Jurnal Perkembangan',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5),
                         ),
                       ),
                     ),

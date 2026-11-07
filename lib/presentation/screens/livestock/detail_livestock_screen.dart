@@ -1,8 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import '../../../core/providers/growth_record_provider.dart';
 import '../../../core/providers/livestock_provider.dart';
+import '../../../models/growth_record_model.dart';
 import '../../../models/livestock_model.dart';
 import 'add_livestock_bottom_sheet.dart';
 
@@ -341,6 +344,24 @@ class _DetailLivestockScreenState extends State<DetailLivestockScreen> {
                           if (newW != null && newW > 0) {
                             context.read<LivestockProvider>().updateWeight(item.id, newW);
                           }
+
+                          final newRecord = GrowthRecordModel(
+                            id: DateTime.now().millisecondsSinceEpoch.toString(),
+                            entityId: item.id,
+                            entityName: item.name,
+                            entityType: 'Ternak',
+                            category: '${item.category} • ${item.breed}',
+                            note: notesController.text.trim().isEmpty
+                                ? 'Pencatatan perkembangan harian ternak di kandang.'
+                                : notesController.text.trim(),
+                            imagePath: pickedImagePath,
+                            date: DateTime.now(),
+                            extraMetric: newW != null && newW > 0
+                                ? 'Bobot: ${newW.toStringAsFixed(1)} kg'
+                                : 'Bobot: ${item.currentWeightKg.toStringAsFixed(1)} kg',
+                          );
+                          context.read<GrowthRecordProvider>().addRecord(newRecord);
+
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -1016,22 +1037,44 @@ class _DetailLivestockScreenState extends State<DetailLivestockScreen> {
               // Tombol Aksi Catat Perkembangan Ternak
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () => _openLivestockJournalModal(item),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF104B36),
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                      elevation: 4,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () => _openLivestockJournalModal(item),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF104B36),
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          elevation: 4,
+                        ),
+                        icon: const Icon(Icons.camera_alt_outlined, color: Colors.white, size: 18),
+                        label: const Text(
+                          'Catat Perkembangan Ternak',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                      ),
                     ),
-                    icon: const Icon(Icons.camera_alt_outlined, color: Colors.white, size: 18),
-                    label: const Text(
-                      'Catat Perkembangan Ternak',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => context.push('/progress-records'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF104B36),
+                          side: const BorderSide(color: Color(0xFF104B36)),
+                          padding: const EdgeInsets.symmetric(vertical: 13),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        icon: const Icon(Icons.photo_library_outlined, size: 18),
+                        label: const Text(
+                          'Lihat Semua Hasil Jurnal Perkembangan',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
               const SizedBox(height: 28),

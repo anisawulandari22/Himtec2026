@@ -38,6 +38,16 @@ class AppDrawer extends StatelessWidget {
                   },
                 ),
                 _DrawerItem(
+                  icon: Icons.photo_library_outlined,
+                  selectedIcon: Icons.photo_library_rounded,
+                  title: 'Catatan Perkembangan',
+                  isSelected: currentRoute == '/progress-records',
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    context.push('/progress-records');
+                  },
+                ),
+                _DrawerItem(
                   icon: Icons.history_rounded,
                   selectedIcon: Icons.history_toggle_off_rounded,
                   title: 'Riwayat',

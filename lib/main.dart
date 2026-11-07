@@ -7,6 +7,7 @@ import 'core/constants/app_constants.dart';
 import 'core/providers/auth_provider.dart';
 import 'core/providers/crop_provider.dart';
 import 'core/providers/livestock_provider.dart';
+import 'core/providers/growth_record_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
@@ -31,6 +32,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => CropProvider()),
         ChangeNotifierProvider(create: (_) => LivestockProvider()),
+        ChangeNotifierProvider(create: (_) => GrowthRecordProvider()),
       ],
       child: const AGLApp(),
     ),
