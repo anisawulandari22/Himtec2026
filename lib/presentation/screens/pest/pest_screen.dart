@@ -433,45 +433,51 @@ class _PestScreenState extends State<PestScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEAF3E7),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  item['category'].toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
-                    color: Color(0xFF196B4A),
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEAF3E7),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    item['category'].toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                      color: Color(0xFF196B4A),
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: item['severity'] == 'Kritis'
-                      ? const Color(0xFFFFEAEA)
-                      : const Color(0xFFFFF4EA),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  'Risiko ${item['severity']}',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
                     color: item['severity'] == 'Kritis'
-                        ? const Color(0xFFBA1A1A)
-                        : const Color(0xFFED7148),
+                        ? const Color(0xFFFFEAEA)
+                        : const Color(0xFFFFF4EA),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    'Risiko ${item['severity']}',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: item['severity'] == 'Kritis'
+                          ? const Color(0xFFBA1A1A)
+                          : const Color(0xFFED7148),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 10),
           Text(
@@ -567,77 +573,89 @@ class _PestScreenState extends State<PestScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF3F6F1),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  disease.category.toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
-                    color: Color(0xFF196B4A),
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF3F6F1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    disease.category.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                      color: Color(0xFF196B4A),
+                    ),
                   ),
                 ),
-              ),
-              Row(
-                children: [
-                  if (disease.isZoonosis) ...[
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    if (disease.isZoonosis)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFEBEE),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          'Zoonosis (Menular Manusia)',
+                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFFC62828)),
+                        ),
+                      ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFEBEE),
+                        color: severityBg,
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Text(
-                        'Zoonosis (Menular Manusia)',
-                        style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFFC62828)),
+                      child: Text(
+                        'Risiko ${disease.severity}',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          color: severityColor,
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 6),
                   ],
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: severityBg,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      'Risiko ${disease.severity}',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w800,
-                        color: severityColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 10),
-          Row(
-            children: [
-              Text(
-                disease.name,
-                style: const TextStyle(
-                  fontSize: 15.5,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF17352B),
+          Text.rich(
+            TextSpan(
+              text: disease.name,
+              style: const TextStyle(
+                fontSize: 15.5,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF17352B),
+              ),
+              children: [
+                const TextSpan(text: ' '),
+                TextSpan(
+                  text: '(${disease.latinName})',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.normal,
+                    color: Color(0xFF72827C),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                '(${disease.latinName})',
-                style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: Color(0xFF72827C)),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 3),
           Text(
