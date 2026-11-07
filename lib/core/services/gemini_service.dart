@@ -32,11 +32,16 @@ class GeminiService {
     await StorageService.saveGeminiApiKey(_apiKey);
   }
 
-  // Model Gemini Vision yang dicoba secara berurutan
+  // Model Gemini Vision yang dicoba secara adaptif berurutan
+  // Mendukung model cloud terbaru (gemini-flash-latest) hingga legacy (1.5/2.0)
   static const List<String> _visionModels = [
-    'gemini-1.5-flash',
+    'gemini-flash-latest',
+    'gemini-3.8-flash',
+    'gemini-3.5-flash',
+    'gemini-2.5-flash',
     'gemini-2.0-flash',
-    'gemini-1.5-pro',
+    'gemini-1.5-flash',
+    'gemini-pro-latest',
   ];
   static const String _baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models';
 
@@ -47,50 +52,52 @@ class GeminiService {
       return {'success': false, 'message': 'API Key masih kosong.'};
     }
 
-    try {
-      final url = Uri.parse('$_baseUrl/gemini-1.5-flash:generateContent?key=$cleanKey');
-      final body = {
-        'contents': [
-          {
-            'parts': [
-              {'text': 'Ping. Balas dengan kata PONG saja.'}
-            ]
-          }
-        ]
-      };
-
-      final response = await http
-          .post(
-            url,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode(body),
-          )
-          .timeout(const Duration(seconds: 12));
-
-      if (response.statusCode == 200) {
-        return {
-          'success': true,
-          'message': 'API Key Google Gemini berhasil terhubung & aktif (Model: Gemini 1.5/2.0 Flash)!'
+    String lastErr = 'Tidak dapat menghubungi server';
+    for (final modelName in _visionModels) {
+      try {
+        final url = Uri.parse('$_baseUrl/$modelName:generateContent?key=$cleanKey');
+        final body = {
+          'contents': [
+            {
+              'parts': [
+                {'text': 'Ping. Balas dengan kata PONG saja.'}
+              ]
+            }
+          ]
         };
-      } else {
-        String detail = 'Status ${response.statusCode}';
-        try {
-          final errJson = jsonDecode(response.body) as Map<String, dynamic>;
-          if (errJson.containsKey('error') && errJson['error'] is Map) {
-            detail = errJson['error']['message']?.toString() ?? detail;
+
+        final response = await http
+            .post(
+              url,
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode(body),
+            )
+            .timeout(const Duration(seconds: 8));
+
+        if (response.statusCode == 200) {
+          return {
+            'success': true,
+            'message': 'API Key Google Gemini berhasil terhubung & aktif (Model: $modelName)!'
+          };
+        } else {
+          try {
+            final errJson = jsonDecode(response.body) as Map<String, dynamic>;
+            if (errJson.containsKey('error') && errJson['error'] is Map) {
+              lastErr = errJson['error']['message']?.toString() ?? 'Status ${response.statusCode}';
+            }
+          } catch (_) {
+            lastErr = 'Status ${response.statusCode}';
           }
-        } catch (_) {}
-        return {
-          'success': false,
-          'message': 'Google API menolak: $detail'
-        };
+        }
+      } catch (e) {
+        lastErr = e.toString();
       }
-    } catch (e) {
-      return {
-        'success': false,
-        'message': 'Koneksi gagal: ${e.toString()}'
-      };
     }
+
+    return {
+      'success': false,
+      'message': 'Google API menolak: $lastErr'
+    };
   }
 
   /// Diagnosa utama pemisahan antara Tanaman dan Hewan Ternak
