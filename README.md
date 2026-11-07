@@ -151,7 +151,7 @@ Himtec2026/
 │   │   │   │   ├── add_livestock_bottom_sheet.dart (Form input ternak baru dengan input foto)
 │   │   │   │   └── detail_livestock_screen.dart    (Detail pakan, vitamin, & pencatatan bobot berfoto)
 │   │   │   ├── market/
-│   │   │   │   └── market_screen.dart      (Bursa komoditas 11 kota & kalkulator karkas daging)
+│   │   │   │   └── market_screen.dart      (Bursa komoditas 11 kota, kalkulator terpisah panen & ternak)
 │   │   │   ├── pest/
 │   │   │   │   └── pest_screen.dart        (Katalog hama dan penyakit tanaman serta hewan ternak)
 │   │   │   ├── profile/
@@ -192,9 +192,11 @@ Himtec2026/
 - Diagnosa instan nama penyakit, taksonomi latin, tingkat keparahan, dan persentase keyakinan.
 - Rekomendasi tindakan kuratif herbal/organik dan langkah preventif jangka panjang.
 
-### 4. Bursa Pasar 11 Kota & Kalkulator Karkas Daging
-- Pantauan harga komoditas pangan dan peternakan di 11 kota sentra ekonomi Indonesia.
-- Kalkulator komparasi cerdas: menganalisis apakah peternak memperoleh laba lebih tinggi dengan menjual timbang hidup langsung atau dipotong menjadi daging karkas dan hasil sampingan.
+### 4. Bursa Pasar 11 Kota & Pemisahan Kalkulator Sektor
+- **Pemisahan Sektor Bersih**: Memisahkan antarmuka, acuan harga, dan kalkulator antara Hasil Panen (Pertanian) dan Hasil Ternak (Peternakan) agar kalkulasi mandiri dan tidak saling bentrok.
+- **Kalkulator Simulasi Panen Pertanian**: Menghitung estimasi total tonase panen, omzet kotor, biaya operasional/pupuk, dan laba bersih berdasarkan populasi lubang tanam dan slider tingkat keberhasilan panen.
+- **Kalkulator Komparasi Penjualan Ternak**: Menganalisis komparasi laba bersih antara penjualan timbang hidup langsung vs sembelih daging karkas (bobot hidup, rendemen %, harga daging karkas, nilai hasil samping jeroan/kulit/kaki, dan biaya potong RPH).
+- **Pantauan Harga Real-Time 11 Kota**: Data harga komoditas acuan di 11 kota sentra ekonomi Indonesia lengkap dengan indikator tren pergerakan harga.
 
 ---
 

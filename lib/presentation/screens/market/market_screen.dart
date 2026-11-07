@@ -12,25 +12,22 @@ class _MarketScreenState extends State<MarketScreen> {
   // Kota aktif saat ini (default: Bandung)
   MarketCity _selectedCity = MarketDataRepository.cities[1];
 
-  // Kategori aktif: 'Semua', 'Pertanian', 'Peternakan'
-  int _selectedCategoryIndex = 0;
-  final List<String> _categoryTabs = [
-    'Semua',
-    'Pertanian (Agriculture)',
-    'Peternakan (Livestock)',
-  ];
+  // Pemisahan Sektor Pasar:
+  // 0: Hasil Panen (Pertanian / Agriculture)
+  // 1: Hasil Ternak (Peternakan / Livestock)
+  int _marketSectorIndex = 0;
 
-  // Komoditas aktif
-  int _selectedCommodityIndex = 0;
+  // Komoditas aktif untuk Hasil Panen Pertanian
+  int _selectedCropIndex = 0;
 
-  // Controllers untuk kalkulator panen
+  // Controllers untuk kalkulator panen pertanian
   late final TextEditingController _holesController;
   late final TextEditingController _weightController;
   late final TextEditingController _priceController;
   late final TextEditingController _costController;
   double _successRate = 0.90; // 90%
 
-  // Controllers untuk kalkulator ternak: timbang hidup vs sembelih daging
+  // Controllers untuk kalkulator ternak: timbang hidup vs sembelih daging karkas
   int _livestockTypeIndex = 0; // 0: Sapi Potong, 1: Kambing / Domba, 2: Ayam Broiler
   late final TextEditingController _lsWeightController;
   late final TextEditingController _lsLivePriceController;
@@ -42,20 +39,26 @@ class _MarketScreenState extends State<MarketScreen> {
   @override
   void initState() {
     super.initState();
-    final initialCommodity = MarketDataRepository.commodities[0];
-    _holesController = TextEditingController(text: initialCommodity.defaultHolesOrHead.toString());
-    _weightController = TextEditingController(text: initialCommodity.defaultWeightGrams.toString());
+    // Inisialisasi Kalkulator Pertanian
+    final initialCrop = _cropCommodities.isNotEmpty
+        ? _cropCommodities[0]
+        : MarketDataRepository.commodities[0];
+    _holesController = TextEditingController(text: initialCrop.defaultHolesOrHead.toString());
+    _weightController = TextEditingController(text: initialCrop.defaultWeightGrams.toString());
     _priceController = TextEditingController(
-      text: initialCommodity.getPriceForCity(_selectedCity.id).toString(),
+      text: initialCrop.getPriceForCity(_selectedCity.id).toString(),
     );
-    _costController = TextEditingController(text: initialCommodity.defaultCost.toString());
+    _costController = TextEditingController(text: initialCrop.defaultCost.toString());
 
-    // Inisialisasi Kalkulator Ternak
+    // Inisialisasi Kalkulator Peternakan
     _lsWeightController = TextEditingController(text: '450');
     _lsLivePriceController = TextEditingController(text: '54000');
     _lsCarcassPercentController = TextEditingController(text: '52.0');
     _lsMeatPriceController = TextEditingController(
-      text: MarketDataRepository.commodities.firstWhere((c) => c.id == 'daging_sapi').getPriceForCity(_selectedCity.id).toString(),
+      text: MarketDataRepository.commodities
+          .firstWhere((c) => c.id == 'daging_sapi')
+          .getPriceForCity(_selectedCity.id)
+          .toString(),
     );
     _lsByproductController = TextEditingController(text: '1800000');
     _lsSlaughterCostController = TextEditingController(text: '250000');
@@ -76,6 +79,28 @@ class _MarketScreenState extends State<MarketScreen> {
     super.dispose();
   }
 
+  // Daftar Komoditas Khusus Pertanian
+  List<CommodityMarketItem> get _cropCommodities {
+    return MarketDataRepository.commodities
+        .where((item) => item.category == 'Pertanian')
+        .toList();
+  }
+
+  // Daftar Komoditas Khusus Peternakan
+  List<CommodityMarketItem> get _livestockCommodities {
+    return MarketDataRepository.commodities
+        .where((item) => item.category == 'Peternakan')
+        .toList();
+  }
+
+  CommodityMarketItem get _currentCropCommodity {
+    final list = _cropCommodities;
+    if (_selectedCropIndex >= list.length) {
+      return list.isNotEmpty ? list[0] : MarketDataRepository.commodities[0];
+    }
+    return list[_selectedCropIndex];
+  }
+
   void _onLivestockPresetChanged(int index) {
     setState(() {
       _livestockTypeIndex = index;
@@ -84,7 +109,10 @@ class _MarketScreenState extends State<MarketScreen> {
         _lsWeightController.text = '450';
         _lsLivePriceController.text = '54000';
         _lsCarcassPercentController.text = '52.0';
-        _lsMeatPriceController.text = MarketDataRepository.commodities.firstWhere((c) => c.id == 'daging_sapi').getPriceForCity(_selectedCity.id).toString();
+        _lsMeatPriceController.text = MarketDataRepository.commodities
+            .firstWhere((c) => c.id == 'daging_sapi')
+            .getPriceForCity(_selectedCity.id)
+            .toString();
         _lsByproductController.text = '1800000';
         _lsSlaughterCostController.text = '250000';
       } else if (index == 1) {
@@ -92,7 +120,12 @@ class _MarketScreenState extends State<MarketScreen> {
         _lsWeightController.text = '40';
         _lsLivePriceController.text = '85000';
         _lsCarcassPercentController.text = '48.0';
-        _lsMeatPriceController.text = '145000';
+        final kambingItem = MarketDataRepository.commodities
+            .where((c) => c.id == 'daging_kambing')
+            .toList();
+        _lsMeatPriceController.text = kambingItem.isNotEmpty
+            ? kambingItem.first.getPriceForCity(_selectedCity.id).toString()
+            : '145000';
         _lsByproductController.text = '250000';
         _lsSlaughterCostController.text = '75000';
       } else if (index == 2) {
@@ -100,60 +133,61 @@ class _MarketScreenState extends State<MarketScreen> {
         _lsWeightController.text = '2.0';
         _lsLivePriceController.text = '22000';
         _lsCarcassPercentController.text = '72.0';
-        _lsMeatPriceController.text = MarketDataRepository.commodities.firstWhere((c) => c.id == 'daging_ayam').getPriceForCity(_selectedCity.id).toString();
+        _lsMeatPriceController.text = MarketDataRepository.commodities
+            .firstWhere((c) => c.id == 'daging_ayam')
+            .getPriceForCity(_selectedCity.id)
+            .toString();
         _lsByproductController.text = '3000';
         _lsSlaughterCostController.text = '2000';
       }
     });
   }
 
-  List<CommodityMarketItem> get _filteredCommodities {
-    if (_selectedCategoryIndex == 1) {
-      return MarketDataRepository.commodities
-          .where((item) => item.category == 'Pertanian')
-          .toList();
-    } else if (_selectedCategoryIndex == 2) {
-      return MarketDataRepository.commodities
-          .where((item) => item.category == 'Peternakan')
-          .toList();
-    }
-    return MarketDataRepository.commodities;
-  }
-
-  CommodityMarketItem get _currentCommodity {
-    final list = _filteredCommodities;
-    if (_selectedCommodityIndex >= list.length) {
-      return list.isNotEmpty ? list[0] : MarketDataRepository.commodities[0];
-    }
-    return list[_selectedCommodityIndex];
-  }
-
   void _onCityChanged(MarketCity city) {
     setState(() {
       _selectedCity = city;
-      // Perbarui harga jual di kalkulator sesuai harga komoditas di kota baru
-      final newPrice = _currentCommodity.getPriceForCity(city.id);
-      _priceController.text = newPrice.toString();
+      // Perbarui harga jual komoditas pertanian aktif
+      final newCropPrice = _currentCropCommodity.getPriceForCity(city.id);
+      _priceController.text = newCropPrice.toString();
+      // Perbarui harga acuan kalkulator ternak aktif
       _onLivestockPresetChanged(_livestockTypeIndex);
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Harga acuan diperbarui untuk wilayah ${city.name} (${city.marketName})'),
+        content: Text('Harga acuan pasar diperbarui: ${city.name} (${city.marketName})'),
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
       ),
     );
   }
 
-  void _onCommoditySelected(int index) {
+  void _onCropCommoditySelected(int index) {
     setState(() {
-      _selectedCommodityIndex = index;
-      final selected = _filteredCommodities[index];
+      _selectedCropIndex = index;
+      final selected = _cropCommodities[index];
       _holesController.text = selected.defaultHolesOrHead.toString();
       _weightController.text = selected.defaultWeightGrams.toString();
       _priceController.text = selected.getPriceForCity(_selectedCity.id).toString();
       _costController.text = selected.defaultCost.toString();
+    });
+  }
+
+  void _onLivestockCommoditySelected(CommodityMarketItem item) {
+    setState(() {
+      final cityPrice = item.getPriceForCity(_selectedCity.id);
+      if (item.id == 'daging_sapi') {
+        _onLivestockPresetChanged(0);
+        _lsMeatPriceController.text = cityPrice.toString();
+      } else if (item.id == 'daging_kambing') {
+        _onLivestockPresetChanged(1);
+        _lsMeatPriceController.text = cityPrice.toString();
+      } else if (item.id == 'daging_ayam') {
+        _onLivestockPresetChanged(2);
+        _lsMeatPriceController.text = cityPrice.toString();
+      } else {
+        _lsMeatPriceController.text = cityPrice.toString();
+      }
     });
   }
 
@@ -339,6 +373,7 @@ class _MarketScreenState extends State<MarketScreen> {
     );
   }
 
+  // ===================== PERHITUNGAN HASIL PANEN PERTANIAN =====================
   double get _totalHarvestKg {
     final holes = double.tryParse(_holesController.text) ?? 0;
     final grams = double.tryParse(_weightController.text) ?? 0;
@@ -355,6 +390,21 @@ class _MarketScreenState extends State<MarketScreen> {
     return _grossRevenue - operationalCost;
   }
 
+  // ===================== PERHITUNGAN PENJUALAN TERNAK =====================
+  double get _lsWeight => double.tryParse(_lsWeightController.text) ?? 0;
+  double get _lsLivePrice => double.tryParse(_lsLivePriceController.text) ?? 0;
+  double get _lsCarcassPercent => double.tryParse(_lsCarcassPercentController.text) ?? 0;
+  double get _lsMeatPrice => double.tryParse(_lsMeatPriceController.text) ?? 0;
+  double get _lsByproduct => double.tryParse(_lsByproductController.text) ?? 0;
+  double get _lsSlaughterCost => double.tryParse(_lsSlaughterCostController.text) ?? 0;
+
+  double get _liveRevenue => _lsWeight * _lsLivePrice;
+  double get _carcassWeightKg => _lsWeight * (_lsCarcassPercent / 100.0);
+  double get _meatRevenue => _carcassWeightKg * _lsMeatPrice;
+  double get _carcassNetRevenue => _meatRevenue + _lsByproduct - _lsSlaughterCost;
+  double get _marginDiff => _carcassNetRevenue - _liveRevenue;
+  bool get _isSlaughterBetter => _marginDiff > 0;
+
   String _formatRupiah(double value) {
     final intVal = value.round();
     return 'Rp ${intVal.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}';
@@ -362,8 +412,6 @@ class _MarketScreenState extends State<MarketScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final commoditiesList = _filteredCommodities;
-
     return Scaffold(
       backgroundColor: const Color(0xFFFAFBF7),
       body: SafeArea(
@@ -418,523 +466,655 @@ class _MarketScreenState extends State<MarketScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-            // 1. Selector Kota Interaktif Real-Time
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFDFE6DA)),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF196B4A).withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEAF3E7),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.location_on_rounded, color: Color(0xFF196B4A), size: 24),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Text(
-                              'WILAYAH PASAR REAL-TIME',
-                              style: TextStyle(
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF72827C),
-                                letterSpacing: 1.0,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Container(
-                              width: 6,
-                              height: 6,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF2E7D32),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            const Text(
-                              'Live',
-                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF2E7D32)),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${_selectedCity.name} (${_selectedCity.province})',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF17352B),
-                          ),
-                        ),
-                        Text(
-                          _selectedCity.marketName,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 11, color: Color(0xFF56625D)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: _openCitySelectorModal,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF196B4A),
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    ),
-                    child: const Text('Ganti Kota', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
 
-            // Horizontal Quick-City Chips (Jakarta, Bandung, Surabaya, Medan, Makassar, Denpasar)
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: MarketDataRepository.cities.take(6).map((city) {
-                  final isSelected = city.id == _selectedCity.id;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ActionChip(
-                      label: Text(city.name),
-                      backgroundColor: isSelected ? const Color(0xFF104B36) : Colors.white,
-                      side: BorderSide(
-                        color: isSelected ? const Color(0xFF104B36) : const Color(0xFFE2E8E3),
-                      ),
-                      labelStyle: TextStyle(
-                        fontSize: 11,
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                        color: isSelected ? Colors.white : const Color(0xFF17352B),
-                      ),
-                      onPressed: () => _onCityChanged(city),
+              // 1. Selector Kota Interaktif Real-Time
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFDFE6DA)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF196B4A).withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
                     ),
-                  );
-                }).toList(),
-              ),
-            ),
-            const SizedBox(height: 18),
-
-            // 2. Proyeksi Laba Banner Card
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: const Color(0xFF104B36),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF104B36).withValues(alpha: 0.15),
-                    blurRadius: 18,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEAF3E7),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.location_on_rounded, color: Color(0xFF196B4A), size: 24),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'PROYEKSI LABA BERSIH • ',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.2,
-                              color: Color(0xFFDCEAC7),
+                          Row(
+                            children: [
+                              const Text(
+                                'WILAYAH PASAR REAL-TIME',
+                                style: TextStyle(
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF72827C),
+                                  letterSpacing: 1.0,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Container(
+                                width: 6,
+                                height: 6,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFF2E7D32),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Text(
+                                'Live',
+                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF2E7D32)),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${_selectedCity.name} (${_selectedCity.province})',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF17352B),
                             ),
                           ),
                           Text(
-                            _selectedCity.name.toUpperCase(),
-                            style: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                              letterSpacing: 1.2,
-                            ),
+                            _selectedCity.marketName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 11, color: Color(0xFF56625D)),
                           ),
                         ],
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          'Sukses ${(_successRate * 100).round()}%',
-                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    _formatRupiah(_netProfit),
-                    style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                      letterSpacing: -0.5,
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildBannerMetric(
-                          'Estimasi Total Panen',
-                          '${_totalHarvestKg.toStringAsFixed(1)} ${_currentCommodity.unit}',
-                        ),
+                    ElevatedButton(
+                      onPressed: _openCitySelectorModal,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF196B4A),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
-                      Container(width: 1, height: 30, color: Colors.white24),
-                      Expanded(
-                        child: _buildBannerMetric(
-                          'Estimasi Omzet (${_selectedCity.name})',
-                          _formatRupiah(_grossRevenue),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                      child: const Text('Ganti Kota', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 12),
 
-            // 3. Tab Kategori (Semua / Pertanian / Peternakan)
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(_categoryTabs.length, (index) {
-                  final isSelected = _selectedCategoryIndex == index;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
-                      label: Text(_categoryTabs[index]),
-                      selected: isSelected,
-                      onSelected: (val) {
-                        setState(() {
-                          _selectedCategoryIndex = index;
-                          _selectedCommodityIndex = 0;
-                          final first = _filteredCommodities.isNotEmpty ? _filteredCommodities[0] : null;
-                          if (first != null) {
-                            _priceController.text = first.getPriceForCity(_selectedCity.id).toString();
-                            _holesController.text = first.defaultHolesOrHead.toString();
-                            _weightController.text = first.defaultWeightGrams.toString();
-                            _costController.text = first.defaultCost.toString();
+              // Horizontal Quick-City Chips
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: MarketDataRepository.cities.take(6).map((city) {
+                    final isSelected = city.id == _selectedCity.id;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ActionChip(
+                        label: Text(city.name),
+                        backgroundColor: isSelected ? const Color(0xFF104B36) : Colors.white,
+                        side: BorderSide(
+                          color: isSelected ? const Color(0xFF104B36) : const Color(0xFFE2E8E3),
+                        ),
+                        labelStyle: TextStyle(
+                          fontSize: 11,
+                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                          color: isSelected ? Colors.white : const Color(0xFF17352B),
+                        ),
+                        onPressed: () => _onCityChanged(city),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // =====================================================================
+              // 2. PEMISAH SEKTOR PASAR: HASIL PANEN (PERTANIAN) vs HASIL PETERNAKAN
+              // =====================================================================
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8EDE8),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          if (_marketSectorIndex != 0) {
+                            setState(() {
+                              _marketSectorIndex = 0;
+                              // Sinkronkan harga komoditas panen pertama
+                              if (_cropCommodities.isNotEmpty) {
+                                _onCropCommoditySelected(_selectedCropIndex.clamp(0, _cropCommodities.length - 1));
+                              }
+                            });
                           }
-                        });
-                      },
-                      showCheckmark: false,
-                      backgroundColor: Colors.white,
-                      selectedColor: const Color(0xFFEAF3E7),
-                      side: BorderSide(
-                        color: isSelected ? const Color(0xFF196B4A) : const Color(0xFFE2E8E3),
+                        },
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 11),
+                          decoration: BoxDecoration(
+                            color: _marketSectorIndex == 0 ? Colors.white : Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: _marketSectorIndex == 0
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.05),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.eco_rounded,
+                                size: 16,
+                                color: _marketSectorIndex == 0 ? const Color(0xFF196B4A) : const Color(0xFF72827C),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Hasil Panen (Pertanian)',
+                                style: TextStyle(
+                                  fontSize: 12.5,
+                                  fontWeight: _marketSectorIndex == 0 ? FontWeight.w800 : FontWeight.w600,
+                                  color: _marketSectorIndex == 0 ? const Color(0xFF196B4A) : const Color(0xFF72827C),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      labelStyle: TextStyle(
-                        fontSize: 11.5,
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                        color: isSelected ? const Color(0xFF196B4A) : const Color(0xFF72827C),
-                      ),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
-                  );
-                }),
-              ),
-            ),
-            const SizedBox(height: 14),
-
-            // 4. Pilih Komoditas
-            Text(
-              'PILIH KOMODITAS (HARGA WILAYAH ${_selectedCity.name.toUpperCase()})',
-              style: const TextStyle(
-                fontSize: 10.5,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.0,
-                color: Color(0xFF72827C),
-              ),
-            ),
-            const SizedBox(height: 8),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(commoditiesList.length, (index) {
-                  final item = commoditiesList[index];
-                  final isSelected = _selectedCommodityIndex == index;
-                  final cityPrice = item.getPriceForCity(_selectedCity.id);
-
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text('${item.name} (${_formatRupiah(cityPrice.toDouble())})'),
-                      selected: isSelected,
-                      onSelected: (val) {
-                        if (val) _onCommoditySelected(index);
-                      },
-                      backgroundColor: Colors.white,
-                      selectedColor: const Color(0xFFEAF3E7),
-                      side: BorderSide(
-                        color: isSelected ? const Color(0xFF196B4A) : const Color(0xFFE2E8E3),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          if (_marketSectorIndex != 1) {
+                            setState(() {
+                              _marketSectorIndex = 1;
+                              _onLivestockPresetChanged(_livestockTypeIndex);
+                            });
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 11),
+                          decoration: BoxDecoration(
+                            color: _marketSectorIndex == 1 ? Colors.white : Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: _marketSectorIndex == 1
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.05),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.pets_rounded,
+                                size: 16,
+                                color: _marketSectorIndex == 1 ? const Color(0xFF196B4A) : const Color(0xFF72827C),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Hasil Ternak (Peternakan)',
+                                style: TextStyle(
+                                  fontSize: 12.5,
+                                  fontWeight: _marketSectorIndex == 1 ? FontWeight.w800 : FontWeight.w600,
+                                  color: _marketSectorIndex == 1 ? const Color(0xFF196B4A) : const Color(0xFF72827C),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      labelStyle: TextStyle(
-                        fontSize: 11.5,
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                        color: isSelected ? const Color(0xFF196B4A) : const Color(0xFF17352B),
-                      ),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
-                  );
-                }),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
-            // 5. Input Parameter Box
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: const Color(0xFFE2E8E3)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'PARAMETER SIMULASI PANEN',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.8,
-                          color: Color(0xFF72827C),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEAF3E7),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          _currentCommodity.category,
-                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF196B4A)),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
+              // =====================================================================
+              // TAMPILAN TERPISAH: SESUAI SEKTOR AKTIF
+              // =====================================================================
+              if (_marketSectorIndex == 0) ...[
+                // ---------------- SEKTOR 1: HASIL PANEN PERTANIAN ----------------
+                _buildCropBannerCard(),
+                const SizedBox(height: 18),
 
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildInputField(
-                          label: 'Populasi (${_currentCommodity.unitLabel})',
-                          controller: _holesController,
-                          suffix: 'unit',
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildInputField(
-                          label: 'Bobot / Volume per Unit',
-                          controller: _weightController,
-                          suffix: 'gram',
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildInputField(
-                          label: 'Harga Pasar ${_selectedCity.name} / ${_currentCommodity.unit}',
-                          controller: _priceController,
-                          suffix: 'Rp',
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildInputField(
-                          label: 'Total Biaya Operasional / Pakan',
-                          controller: _costController,
-                          suffix: 'Rp',
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Slider Keberhasilan
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Tingkat Keberhasilan Panen:',
-                        style: TextStyle(fontSize: 12, color: Color(0xFF4A554E), fontWeight: FontWeight.w600),
-                      ),
-                      Text(
-                        '${(_successRate * 100).round()}%',
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF196B4A)),
-                      ),
-                    ],
-                  ),
-                  SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: const Color(0xFF196B4A),
-                      inactiveTrackColor: const Color(0xFFE2E8E3),
-                      thumbColor: const Color(0xFF196B4A),
-                      trackHeight: 4,
-                    ),
-                    child: Slider(
-                      value: _successRate,
-                      min: 0.50,
-                      max: 1.00,
-                      divisions: 10,
-                      onChanged: (val) {
-                        setState(() => _successRate = val);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // 5b. Kalkulator Komparasi Ternak: Jual Hidup vs Sembelih Daging Karkas
-            _buildLivestockComparisonSection(),
-            const SizedBox(height: 24),
-
-            // 6. Daftar Acuan Harga Real-Time Kota Terpilih
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'DAFTAR HARGA PASAR • ${_selectedCity.name.toUpperCase()}',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.0,
-                          color: Color(0xFF72827C),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _selectedCity.marketName,
-                        style: const TextStyle(fontSize: 11, color: Color(0xFF196B4A), fontWeight: FontWeight.w600),
-                      ),
-                    ],
+                // Pilih Komoditas Panen
+                Text(
+                  'KOMODITAS PANEN PERTANIAN (${_selectedCity.name.toUpperCase()})',
+                  style: const TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.0,
+                    color: Color(0xFF72827C),
                   ),
                 ),
-                TextButton.icon(
-                  onPressed: _openCitySelectorModal,
-                  icon: const Icon(Icons.tune_rounded, size: 16, color: Color(0xFF196B4A)),
-                  label: const Text('Ganti', style: TextStyle(fontSize: 12, color: Color(0xFF196B4A), fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: List.generate(_cropCommodities.length, (index) {
+                      final item = _cropCommodities[index];
+                      final isSelected = _selectedCropIndex == index;
+                      final cityPrice = item.getPriceForCity(_selectedCity.id);
+
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: ChoiceChip(
+                          label: Text('${item.name} (${_formatRupiah(cityPrice.toDouble())})'),
+                          selected: isSelected,
+                          onSelected: (val) {
+                            if (val) _onCropCommoditySelected(index);
+                          },
+                          backgroundColor: Colors.white,
+                          selectedColor: const Color(0xFFEAF3E7),
+                          side: BorderSide(
+                            color: isSelected ? const Color(0xFF196B4A) : const Color(0xFFE2E8E3),
+                          ),
+                          labelStyle: TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                            color: isSelected ? const Color(0xFF196B4A) : const Color(0xFF17352B),
+                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                      );
+                    }),
+                  ),
                 ),
+                const SizedBox(height: 18),
+
+                // Kalkulator Simulasi Panen Pertanian
+                _buildCropCalculatorSection(),
+                const SizedBox(height: 22),
+
+                // Daftar Harga Komoditas Pertanian
+                _buildCommodityPriceListHeader('KOMODITAS PANEN PERTANIAN'),
+                const SizedBox(height: 8),
+                _buildCommodityPriceListCard(_cropCommodities, onSelect: (item) {
+                  final idx = _cropCommodities.indexOf(item);
+                  if (idx != -1) _onCropCommoditySelected(idx);
+                }),
+              ] else ...[
+                // ---------------- SEKTOR 2: HASIL PETERNAKAN ----------------
+                _buildLivestockBannerCard(),
+                const SizedBox(height: 18),
+
+                // Kalkulator Komparasi Penjualan Ternak: Timbang Hidup vs Sembelih Karkas
+                _buildLivestockComparisonSection(),
+                const SizedBox(height: 22),
+
+                // Daftar Harga Komoditas Peternakan
+                _buildCommodityPriceListHeader('KOMODITAS DAGING & PETERNAKAN'),
+                const SizedBox(height: 8),
+                _buildCommodityPriceListCard(_livestockCommodities, onSelect: (item) {
+                  _onLivestockCommoditySelected(item);
+                }),
               ],
-            ),
-            const SizedBox(height: 8),
-
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE2E8E3)),
-              ),
-              child: Column(
-                children: commoditiesList.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final item = entry.value;
-                  final isLast = index == commoditiesList.length - 1;
-                  final price = item.getPriceForCity(_selectedCity.id);
-                  final trend = item.getTrendForCity(_selectedCity.id);
-                  final change = item.getChangeForCity(_selectedCity.id);
-
-                  return Column(
-                    children: [
-                      _buildMarketPriceRow(
-                        item: item,
-                        price: price,
-                        trend: trend,
-                        change: change,
-                        onTap: () => _onCommoditySelected(index),
-                      ),
-                      if (!isLast) const Divider(height: 1, color: Color(0xFFF0F4F1)),
-                    ],
-                  );
-                }).toList(),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-  Widget _buildBannerMetric(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(fontSize: 11, color: Color(0xFFD3E4DB)),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
-        ),
-      ],
+  // ===================== WIDGET HASIL PANEN (PERTANIAN) =====================
+
+  Widget _buildCropBannerCard() {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: const Color(0xFF104B36),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF104B36).withValues(alpha: 0.15),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  const Text(
+                    'PROYEKSI LABA PANEN • ',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.2,
+                      color: Color(0xFFDCEAC7),
+                    ),
+                  ),
+                  Text(
+                    _selectedCity.name.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  'Sukses ${(_successRate * 100).round()}%',
+                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            _formatRupiah(_netProfit),
+            style: const TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildBannerMetric(
+                  'Estimasi Total Panen',
+                  '${_totalHarvestKg.toStringAsFixed(1)} ${_currentCropCommodity.unit}',
+                ),
+              ),
+              Container(width: 1, height: 30, color: Colors.white24),
+              Expanded(
+                child: _buildBannerMetric(
+                  'Estimasi Omzet (${_selectedCity.name})',
+                  _formatRupiah(_grossRevenue),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCropCalculatorSection() {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE2E8E3)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF196B4A).withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.calculate_rounded, color: Color(0xFF196B4A), size: 18),
+                  SizedBox(width: 8),
+                  Text(
+                    'SIMULASI PANEN & LABA BERSIH',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.8,
+                      color: Color(0xFF196B4A),
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEAF3E7),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  _currentCropCommodity.name,
+                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF196B4A)),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          Row(
+            children: [
+              Expanded(
+                child: _buildInputField(
+                  label: 'Populasi (${_currentCropCommodity.unitLabel})',
+                  controller: _holesController,
+                  suffix: 'unit',
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildInputField(
+                  label: 'Bobot / Volume per Unit',
+                  controller: _weightController,
+                  suffix: 'gram',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          Row(
+            children: [
+              Expanded(
+                child: _buildInputField(
+                  label: 'Harga Pasar ${_selectedCity.name} / ${_currentCropCommodity.unit}',
+                  controller: _priceController,
+                  suffix: 'Rp',
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildInputField(
+                  label: 'Total Biaya Operasional / Pupuk',
+                  controller: _costController,
+                  suffix: 'Rp',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Slider Keberhasilan
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Tingkat Keberhasilan Panen:',
+                style: TextStyle(fontSize: 12, color: Color(0xFF4A554E), fontWeight: FontWeight.w600),
+              ),
+              Text(
+                '${(_successRate * 100).round()}%',
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF196B4A)),
+              ),
+            ],
+          ),
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              activeTrackColor: const Color(0xFF196B4A),
+              inactiveTrackColor: const Color(0xFFE2E8E3),
+              thumbColor: const Color(0xFF196B4A),
+              trackHeight: 4,
+            ),
+            child: Slider(
+              value: _successRate,
+              min: 0.50,
+              max: 1.00,
+              divisions: 10,
+              onChanged: (val) {
+                setState(() => _successRate = val);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ===================== WIDGET HASIL PETERNAKAN =====================
+
+  Widget _buildLivestockBannerCard() {
+    final marginDiff = _marginDiff;
+    final isSlaughterBetter = _isSlaughterBetter;
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: const Color(0xFF104B36),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF104B36).withValues(alpha: 0.15),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  const Text(
+                    'ANALISIS PENJUALAN TERNAK • ',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.2,
+                      color: Color(0xFFDCEAC7),
+                    ),
+                  ),
+                  Text(
+                    _selectedCity.name.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  isSlaughterBetter ? 'Rekomendasi: Potong Karkas' : 'Rekomendasi: Timbang Hidup',
+                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            isSlaughterBetter ? '+${_formatRupiah(marginDiff)}' : '+${_formatRupiah(-marginDiff)}',
+            style: const TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            isSlaughterBetter
+                ? 'Surplus laba jika dipotong karkas dibanding timbang hidup'
+                : 'Surplus keuntungan jika dijual timbang hidup langsung',
+            style: const TextStyle(fontSize: 11.5, color: Color(0xFFD3E4DB)),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildBannerMetric(
+                  'Omzet Timbang Hidup',
+                  _formatRupiah(_liveRevenue),
+                ),
+              ),
+              Container(width: 1, height: 30, color: Colors.white24),
+              Expanded(
+                child: _buildBannerMetric(
+                  'Penerimaan Bersih Karkas',
+                  _formatRupiah(_carcassNetRevenue),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildLivestockComparisonSection() {
-    final weight = double.tryParse(_lsWeightController.text) ?? 0;
-    final livePrice = double.tryParse(_lsLivePriceController.text) ?? 0;
-    final carcassPercent = double.tryParse(_lsCarcassPercentController.text) ?? 0;
-    final meatPrice = double.tryParse(_lsMeatPriceController.text) ?? 0;
-    final byproduct = double.tryParse(_lsByproductController.text) ?? 0;
-    final slaughterCost = double.tryParse(_lsSlaughterCostController.text) ?? 0;
-
-    final liveRevenue = weight * livePrice;
-    final carcassWeightKg = weight * (carcassPercent / 100.0);
-    final meatRevenue = carcassWeightKg * meatPrice;
-    final carcassNetRevenue = meatRevenue + byproduct - slaughterCost;
-    final marginDiff = carcassNetRevenue - liveRevenue;
-    final bool isSlaughterBetter = marginDiff > 0;
+    final weight = _lsWeight;
+    final livePrice = _lsLivePrice;
+    final liveRevenue = _liveRevenue;
+    final carcassWeightKg = _carcassWeightKg;
+    final carcassNetRevenue = _carcassNetRevenue;
+    final marginDiff = _marginDiff;
+    final isSlaughterBetter = _isSlaughterBetter;
 
     final presetLabels = ['Sapi Potong', 'Kambing / Domba', 'Ayam Broiler'];
 
@@ -1261,6 +1441,25 @@ class _MarketScreenState extends State<MarketScreen> {
     );
   }
 
+  // ===================== WIDGET BERSAMA (COMMON) =====================
+
+  Widget _buildBannerMetric(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontSize: 11, color: Color(0xFFD3E4DB)),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
+        ),
+      ],
+    );
+  }
+
   Widget _buildInputField({
     required String label,
     required TextEditingController controller,
@@ -1287,6 +1486,83 @@ class _MarketScreenState extends State<MarketScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildCommodityPriceListHeader(String categoryTitle) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'HARGA PASAR • ${_selectedCity.name.toUpperCase()} ($categoryTitle)',
+                style: const TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.8,
+                  color: Color(0xFF72827C),
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                _selectedCity.marketName,
+                style: const TextStyle(fontSize: 11, color: Color(0xFF196B4A), fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+        ),
+        TextButton.icon(
+          onPressed: _openCitySelectorModal,
+          icon: const Icon(Icons.tune_rounded, size: 16, color: Color(0xFF196B4A)),
+          label: const Text('Ganti Kota', style: TextStyle(fontSize: 11.5, color: Color(0xFF196B4A), fontWeight: FontWeight.bold)),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCommodityPriceListCard(
+    List<CommodityMarketItem> commodities, {
+    required Function(CommodityMarketItem) onSelect,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8E3)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF196B4A).withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        children: commodities.asMap().entries.map((entry) {
+          final index = entry.key;
+          final item = entry.value;
+          final isLast = index == commodities.length - 1;
+          final price = item.getPriceForCity(_selectedCity.id);
+          final trend = item.getTrendForCity(_selectedCity.id);
+          final change = item.getChangeForCity(_selectedCity.id);
+
+          return Column(
+            children: [
+              _buildMarketPriceRow(
+                item: item,
+                price: price,
+                trend: trend,
+                change: change,
+                onTap: () => onSelect(item),
+              ),
+              if (!isLast) const Divider(height: 1, color: Color(0xFFF0F4F1)),
+            ],
+          );
+        }).toList(),
+      ),
     );
   }
 
