@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../../../core/providers/auth_provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final canPop = Navigator.canPop(context);
+    final auth = context.watch<AuthProvider>();
+    final user = auth.currentUser;
+
+    final name = user?.name ?? 'Luna Teguh';
+    final email = user?.email ?? 'luna.teguh@agl.id';
+    final memberId = user?.memberId ?? 'AGL-ID-8829-IDN';
+    final sector = user?.sector ?? 'Pertanian & Peternakan';
+    final isGoogle = user?.provider == 'google';
+    final initials = name.split(' ').map((w) => w.isNotEmpty ? w[0] : '').take(2).join('').toUpperCase();
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAFBF7),
       appBar: AppBar(
-        title: const Text('Profil Petani'),
+        title: const Text('Profil Pengguna AGL'),
         centerTitle: false,
         leading: canPop
             ? IconButton(
@@ -53,9 +63,9 @@ class ProfileScreen extends StatelessWidget {
                   CircleAvatar(
                     radius: 40,
                     backgroundColor: const Color(0xFF104B36),
-                    child: const Text(
-                      'PU',
-                      style: TextStyle(
+                    child: Text(
+                      initials.isNotEmpty ? initials : 'AG',
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w800,
                         color: Colors.white,
@@ -64,45 +74,64 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 14),
-                  const Text(
-                    'Luna Teguh',
-                    style: TextStyle(
+                  Text(
+                    name,
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
                       color: Color(0xFF17352B),
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'Penggiat Urban Farming & Hidroponik',
-                    style: TextStyle(
-                      fontSize: 12,
+                  Text(
+                    email,
+                    style: const TextStyle(
+                      fontSize: 12.5,
                       color: Color(0xFF72827C),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEAF3E7),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(Icons.verified, size: 14, color: Color(0xFF196B4A)),
-                        SizedBox(width: 6),
-                        Text(
-                          'Petani Urban Aktif • Rooftop Bandung',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF196B4A),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEAF3E7),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.verified, size: 14, color: Color(0xFF196B4A)),
+                            const SizedBox(width: 4),
+                            Text(
+                              memberId,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF196B4A),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (isGoogle)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE3F2FD),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Text(
+                            'Akun Google Terhubung',
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF1565C0)),
                           ),
                         ),
-                      ],
-                    ),
+                    ],
                   ),
                 ],
               ),
@@ -110,15 +139,15 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 22),
 
             // Statistics Grid
-            Align(
+            const Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'STATISTIK PERKEBUNAN',
+                'STATISTIK AGRO & TERNAK',
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1.0,
-                  color: const Color(0xFF72827C),
+                  color: Color(0xFF72827C),
                 ),
               ),
             ),
@@ -135,9 +164,9 @@ class ProfileScreen extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: _buildStatTile(
-                    title: 'Tanaman Aktif',
-                    value: '3 Ragam',
-                    icon: Icons.yard_outlined,
+                    title: 'Populasi Ternak',
+                    value: '5 Ekor',
+                    icon: Icons.pets_rounded,
                   ),
                 ),
               ],
@@ -155,7 +184,7 @@ class ProfileScreen extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: _buildStatTile(
-                    title: 'Lama Bertani',
+                    title: 'Lama Bergabung',
                     value: '180 Hari',
                     icon: Icons.calendar_today_rounded,
                   ),
@@ -164,16 +193,16 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Spesifikasi Kebun
-            Align(
+            // Informasi Akun & Sektor
+            const Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'SPESIFIKASI INSTALASI KEBUN',
+                'INFORMASI AKUN & SEKTOR USAHA',
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1.0,
-                  color: const Color(0xFF72827C),
+                  color: Color(0xFF72827C),
                 ),
               ),
             ),
@@ -186,47 +215,76 @@ class ProfileScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  _buildSpecRow('Metode Utama', 'Hidroponik NFT & Dutch Bucket'),
+                  _buildSpecRow('Sektor Fokus', sector),
                   const Divider(height: 1),
-                  _buildSpecRow('Kapasitas Tanam', '120 Lubang Tanam'),
+                  _buildSpecRow('Metode Pertanian', 'Hidroponik & Kebun Terbuka'),
                   const Divider(height: 1),
-                  _buildSpecRow('Nutrisi Digunakan', 'AB Mix Formulasi Sayur Daun'),
+                  _buildSpecRow('Penyimpanan Data', 'Tersimpan Permanen (Lokal & Akun)'),
                   const Divider(height: 1),
-                  _buildSpecRow('Sensor Otomasi', 'ESP32 pH & TDS Monitor Aktif'),
+                  _buildSpecRow('Metode Masuk', isGoogle ? 'Google OAuth' : 'Email & Password'),
                   const Divider(height: 1),
-                  _buildSpecRow('Lokasi', 'Coblong, Kota Bandung'),
+                  _buildSpecRow('Wilayah Acuan Pasar', 'Bandung (Pasar Caringin)'),
                 ],
               ),
             ),
             const SizedBox(height: 24),
 
-            // Actions Menu
+            // Tombol Keluar dari Akun (Logout)
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Form pengeditan data kebun dibuka.'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                },
+                onPressed: () => _confirmLogout(context),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  side: const BorderSide(color: Color(0xFFDFE6DA)),
+                  side: const BorderSide(color: Color(0xFFF0CBCB)),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  backgroundColor: Colors.white,
+                  backgroundColor: const Color(0xFFFFF8F8),
                 ),
-                icon: const Icon(Icons.edit_outlined, size: 18, color: Color(0xFF196B4A)),
+                icon: const Icon(Icons.logout_rounded, size: 18, color: Color(0xFFBA1A1A)),
                 label: const Text(
-                  'Ubah Profil & Data Kebun',
-                  style: TextStyle(color: Color(0xFF196B4A), fontWeight: FontWeight.w700),
+                  'Keluar dari Akun',
+                  style: TextStyle(color: Color(0xFFBA1A1A), fontWeight: FontWeight.w700),
                 ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _confirmLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Keluar dari Akun', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 17)),
+        content: const Text(
+          'Apakah Anda yakin ingin keluar? Seluruh data riwayat kebun dan ternak Anda tetap tersimpan aman di aplikasi.',
+          style: TextStyle(fontSize: 13, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFBA1A1A),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await context.read<AuthProvider>().logout();
+              if (context.mounted) {
+                context.go('/login');
+              }
+            },
+            child: const Text('Ya, Keluar'),
+          ),
+        ],
       ),
     );
   }

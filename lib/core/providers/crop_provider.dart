@@ -1,8 +1,11 @@
 import 'package:flutter/foundation.dart';
 import '../../models/crop_model.dart';
+import '../services/storage_service.dart';
 
 class CropProvider extends ChangeNotifier {
-  final List<CropModel> _crops = [
+  final List<CropModel> _crops = [];
+
+  static final List<CropModel> _defaultSeedCrops = [
     CropModel(
       id: '1',
       name: 'Padi Inpari 32',
@@ -132,6 +135,23 @@ class CropProvider extends ChangeNotifier {
     ),
   ];
 
+  CropProvider() {
+    _loadCrops();
+  }
+
+  Future<void> _loadCrops() async {
+    final saved = await StorageService.getCrops();
+    if (saved != null && saved.isNotEmpty) {
+      _crops.clear();
+      _crops.addAll(saved);
+    } else {
+      _crops.clear();
+      _crops.addAll(_defaultSeedCrops);
+      await StorageService.saveCrops(_crops);
+    }
+    notifyListeners();
+  }
+
   List<CropModel> get crops => List.unmodifiable(_crops);
 
   int get totalActiveCrops => _crops.length;
@@ -162,11 +182,13 @@ class CropProvider extends ChangeNotifier {
   void addCrop(CropModel crop) {
     _crops.insert(0, crop);
     notifyListeners();
+    StorageService.saveCrops(_crops);
   }
 
   void removeCrop(String id) {
     _crops.removeWhere((crop) => crop.id == id);
     notifyListeners();
+    StorageService.saveCrops(_crops);
   }
 
   void toggleTask(String cropId, int taskIndex) {
@@ -176,15 +198,7 @@ class CropProvider extends ChangeNotifier {
       task.isCompleted = !task.isCompleted;
       task.subtitle = task.isCompleted ? 'Selesai' : 'Belum selesai';
       notifyListeners();
-    }
-  }
-
-  void updateHealthStatus(String cropId, String status) {
-    final crop = getCropById(cropId);
-    if (crop != null) {
-      // In CropModel healthStatus is final, we can replace or keep it mutable
-      notifyListeners();
+      StorageService.saveCrops(_crops);
     }
   }
 }
-

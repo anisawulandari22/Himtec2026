@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../providers/auth_provider.dart';
+import '../../presentation/screens/auth/login_screen.dart';
+import '../../presentation/screens/auth/register_screen.dart';
 import '../../presentation/screens/drawer/help_screen.dart';
 import '../../presentation/screens/drawer/history_screen.dart';
 import '../../presentation/screens/drawer/settings_screen.dart';
@@ -16,78 +19,109 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 class AppRouter {
   AppRouter._();
 
-  static final GoRouter router = GoRouter(
-    navigatorKey: _rootNavigatorKey,
-    initialLocation: '/home',
-    debugLogDiagnostics: false,
-    routes: [
-      StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) {
-          return MainWrapper(navigationShell: navigationShell);
-        },
-        branches: [
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/home',
-                pageBuilder: (context, state) => const NoTransitionPage(
-                  child: HomeScreen(),
-                ),
-              ),
-            ],
+  static GoRouter createRouter(AuthProvider authProvider) {
+    return GoRouter(
+      navigatorKey: _rootNavigatorKey,
+      initialLocation: authProvider.isAuthenticated ? '/home' : '/login',
+      refreshListenable: authProvider,
+      debugLogDiagnostics: false,
+      redirect: (context, state) {
+        final isLoggedIn = authProvider.isAuthenticated;
+        final isAuthRoute = state.matchedLocation == '/login' || state.matchedLocation == '/register';
+
+        if (!isLoggedIn && !isAuthRoute) {
+          return '/login';
+        }
+
+        if (isLoggedIn && isAuthRoute) {
+          return '/home';
+        }
+
+        return null;
+      },
+      routes: [
+        GoRoute(
+          parentNavigatorKey: _rootNavigatorKey,
+          path: '/login',
+          pageBuilder: (context, state) => const NoTransitionPage(
+            child: LoginScreen(),
           ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/pest',
-                pageBuilder: (context, state) => const NoTransitionPage(
-                  child: PestScreen(),
-                ),
-              ),
-            ],
+        ),
+        GoRoute(
+          parentNavigatorKey: _rootNavigatorKey,
+          path: '/register',
+          pageBuilder: (context, state) => const NoTransitionPage(
+            child: RegisterScreen(),
           ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/market',
-                pageBuilder: (context, state) => const NoTransitionPage(
-                  child: MarketScreen(),
+        ),
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, navigationShell) {
+            return MainWrapper(navigationShell: navigationShell);
+          },
+          branches: [
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/home',
+                  pageBuilder: (context, state) => const NoTransitionPage(
+                    child: HomeScreen(),
+                  ),
                 ),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/profile',
-                pageBuilder: (context, state) => const NoTransitionPage(
-                  child: ProfileScreen(),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/pest',
+                  pageBuilder: (context, state) => const NoTransitionPage(
+                    child: PestScreen(),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
-      ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: '/history',
-        builder: (context, state) => const HistoryScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: '/settings',
-        builder: (context, state) => const SettingsScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: '/help',
-        builder: (context, state) => const HelpScreen(),
-      ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: '/scan',
-        builder: (context, state) => const DiseaseScanScreen(),
-      ),
-    ],
-  );
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/market',
+                  pageBuilder: (context, state) => const NoTransitionPage(
+                    child: MarketScreen(),
+                  ),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/profile',
+                  pageBuilder: (context, state) => const NoTransitionPage(
+                    child: ProfileScreen(),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        GoRoute(
+          parentNavigatorKey: _rootNavigatorKey,
+          path: '/history',
+          builder: (context, state) => const HistoryScreen(),
+        ),
+        GoRoute(
+          parentNavigatorKey: _rootNavigatorKey,
+          path: '/settings',
+          builder: (context, state) => const SettingsScreen(),
+        ),
+        GoRoute(
+          parentNavigatorKey: _rootNavigatorKey,
+          path: '/help',
+          builder: (context, state) => const HelpScreen(),
+        ),
+        GoRoute(
+          parentNavigatorKey: _rootNavigatorKey,
+          path: '/scan',
+          builder: (context, state) => const DiseaseScanScreen(),
+        ),
+      ],
+    );
+  }
 }

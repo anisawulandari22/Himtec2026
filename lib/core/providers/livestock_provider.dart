@@ -1,8 +1,11 @@
 import 'package:flutter/foundation.dart';
 import '../../models/livestock_model.dart';
+import '../services/storage_service.dart';
 
 class LivestockProvider extends ChangeNotifier {
-  final List<LivestockModel> _livestock = [
+  final List<LivestockModel> _livestock = [];
+
+  static final List<LivestockModel> _defaultSeedLivestock = [
     LivestockModel(
       id: '1',
       tagNumber: 'AGL-SP-042',
@@ -186,6 +189,23 @@ class LivestockProvider extends ChangeNotifier {
     ),
   ];
 
+  LivestockProvider() {
+    _loadLivestock();
+  }
+
+  Future<void> _loadLivestock() async {
+    final saved = await StorageService.getLivestock();
+    if (saved != null && saved.isNotEmpty) {
+      _livestock.clear();
+      _livestock.addAll(saved);
+    } else {
+      _livestock.clear();
+      _livestock.addAll(_defaultSeedLivestock);
+      await StorageService.saveLivestock(_livestock);
+    }
+    notifyListeners();
+  }
+
   List<LivestockModel> get livestockList => List.unmodifiable(_livestock);
 
   int get totalLivestock => _livestock.length;
@@ -206,11 +226,13 @@ class LivestockProvider extends ChangeNotifier {
   void addLivestock(LivestockModel item) {
     _livestock.insert(0, item);
     notifyListeners();
+    StorageService.saveLivestock(_livestock);
   }
 
   void removeLivestock(String id) {
     _livestock.removeWhere((item) => item.id == id);
     notifyListeners();
+    StorageService.saveLivestock(_livestock);
   }
 
   void updateWeight(String id, double newWeight) {
@@ -233,6 +255,7 @@ class LivestockProvider extends ChangeNotifier {
         tasks: current.tasks,
       );
       notifyListeners();
+      StorageService.saveLivestock(_livestock);
     }
   }
 
@@ -243,6 +266,7 @@ class LivestockProvider extends ChangeNotifier {
       task.isCompleted = !task.isCompleted;
       task.subtitle = task.isCompleted ? 'Selesai' : 'Belum selesai';
       notifyListeners();
+      StorageService.saveLivestock(_livestock);
     }
   }
 
@@ -338,3 +362,4 @@ class LivestockProvider extends ChangeNotifier {
     ),
   ];
 }
+

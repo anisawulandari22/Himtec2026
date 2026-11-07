@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../../core/providers/auth_provider.dart';
 
 class AppDrawer extends StatelessWidget {
   final String currentRoute;
@@ -13,12 +15,14 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final auth = context.watch<AuthProvider>();
+    final user = auth.currentUser;
 
     return Drawer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildHeader(context, colorScheme),
+          _buildHeader(context, colorScheme, user),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -87,7 +91,12 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, ColorScheme colorScheme) {
+  Widget _buildHeader(BuildContext context, ColorScheme colorScheme, dynamic user) {
+    final name = user?.name ?? 'Luna Teguh';
+    final email = user?.email ?? 'luna.teguh@agl.id';
+    final initials = name.split(' ').map((w) => w.isNotEmpty ? w[0] : '').take(2).join('').toUpperCase();
+    final isGoogle = user?.provider == 'google';
+
     return Container(
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 20,
@@ -113,7 +122,7 @@ class AppDrawer extends StatelessWidget {
                 radius: 26,
                 backgroundColor: colorScheme.primary,
                 child: Text(
-                  'LT',
+                  initials.isNotEmpty ? initials : 'AG',
                   style: TextStyle(
                     color: colorScheme.onPrimary,
                     fontSize: 16,
@@ -133,20 +142,29 @@ class AppDrawer extends StatelessWidget {
                     width: 1,
                   ),
                 ),
-                child: Text(
-                  'Petani Aktif',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.primary,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (isGoogle) ...[
+                      const Icon(Icons.g_mobiledata_rounded, size: 14, color: Color(0xFF196B4A)),
+                      const SizedBox(width: 2),
+                    ],
+                    Text(
+                      isGoogle ? 'Akun Google' : 'Petani Terverifikasi',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 14),
           Text(
-            'Luna Teguh',
+            name,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
@@ -156,9 +174,9 @@ class AppDrawer extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            'luna.teguh@agl.id',
+            email,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 12,
               color: colorScheme.onSurfaceVariant,
             ),
           ),
@@ -198,13 +216,6 @@ class AppDrawer extends StatelessWidget {
       ),
     );
   }
-          fontSize: 11,
-          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
 
   void _showLogoutDialog(BuildContext context) {
     showDialog(
@@ -213,15 +224,15 @@ class AppDrawer extends StatelessWidget {
         final colorScheme = Theme.of(ctx).colorScheme;
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
           title: const Text(
             'Konfirmasi Keluar',
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
           ),
           content: const Text(
-            'Apakah Anda yakin ingin keluar dari sesi akun saat ini?',
-            style: TextStyle(fontSize: 14),
+            'Apakah Anda yakin ingin keluar dari akun AGL saat ini? Riwayat data tetap tersimpan aman di perangkat.',
+            style: TextStyle(fontSize: 13, height: 1.4),
           ),
           actions: [
             TextButton(
@@ -235,17 +246,17 @@ class AppDrawer extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: colorScheme.error,
                 foregroundColor: colorScheme.onError,
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(ctx).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Berhasil keluar dari sesi.'),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
+                await context.read<AuthProvider>().logout();
+                if (context.mounted) {
+                  context.go('/login');
+                }
               },
-              child: const Text('Keluar'),
+              child: const Text('Ya, Keluar'),
             ),
           ],
         );
@@ -278,44 +289,48 @@ class _DrawerItem extends StatelessWidget {
 
     Color iconColor;
     Color textColor;
-    Color? tileColor;
+    FontWeight fontWeight;
 
     if (isDestructive) {
       iconColor = colorScheme.error;
       textColor = colorScheme.error;
-      tileColor = null;
+      fontWeight = FontWeight.w600;
     } else if (isSelected) {
       iconColor = colorScheme.primary;
       textColor = colorScheme.primary;
-      tileColor = colorScheme.primaryContainer.withValues(alpha: 0.5);
+      fontWeight = FontWeight.w700;
     } else {
       iconColor = colorScheme.onSurfaceVariant;
       textColor = colorScheme.onSurface;
-      tileColor = null;
+      fontWeight = FontWeight.w500;
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 2),
+      margin: const EdgeInsets.symmetric(vertical: 2),
+      decoration: BoxDecoration(
+        color: isSelected ? colorScheme.primaryContainer.withValues(alpha: 0.4) : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: ListTile(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
         ),
-        tileColor: tileColor,
-        dense: true,
         leading: Icon(
           isSelected ? selectedIcon : icon,
-          size: 20,
           color: iconColor,
+          size: 22,
         ),
         title: Text(
           title,
           style: TextStyle(
             fontSize: 14,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+            fontWeight: fontWeight,
             color: textColor,
           ),
         ),
         onTap: onTap,
+        dense: true,
+        visualDensity: const VisualDensity(horizontal: 0, vertical: -1),
       ),
     );
   }

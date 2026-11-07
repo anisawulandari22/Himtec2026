@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import 'core/constants/app_constants.dart';
+import 'core/providers/auth_provider.dart';
 import 'core/providers/crop_provider.dart';
 import 'core/providers/livestock_provider.dart';
 import 'core/router/app_router.dart';
@@ -26,6 +28,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => CropProvider()),
         ChangeNotifierProvider(create: (_) => LivestockProvider()),
       ],
@@ -34,8 +37,24 @@ void main() {
   );
 }
 
-class AGLApp extends StatelessWidget {
+class AGLApp extends StatefulWidget {
   const AGLApp({super.key});
+
+  @override
+  State<AGLApp> createState() => _AGLAppState();
+}
+
+class _AGLAppState extends State<AGLApp> {
+  GoRouter? _router;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_router == null) {
+      final authProvider = context.read<AuthProvider>();
+      _router = AppRouter.createRouter(authProvider);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +66,7 @@ class AGLApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeProvider.themeMode,
-      routerConfig: AppRouter.router,
+      routerConfig: _router,
     );
   }
 }

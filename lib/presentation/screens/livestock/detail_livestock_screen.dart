@@ -750,3 +750,4 @@ class _DetailLivestockScreenState extends State<DetailLivestockScreen> {
     );
   }
 }
+
