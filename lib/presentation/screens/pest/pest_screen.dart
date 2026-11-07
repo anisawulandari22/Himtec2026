@@ -548,7 +548,8 @@ class _PestScreenState extends State<PestScreen> {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildPestCard(BuildContext context, Map<String, dynamic> item) {
@@ -844,7 +845,6 @@ class _PestScreenState extends State<PestScreen> {
           ),
         ],
       ),
-    ),
-  );
+    );
   }
 }

@@ -157,7 +157,6 @@ Berikan diagnosa dalam format JSON murni tanpa pembungkus teks tambahan, dengan 
     int sumLuminance = 0;
     int darkPixels = 0;
     int brightPixels = 0;
-    int midPixels = 0;
     int checksum = 0;
 
     for (int i = 0; i < length && i < sampleCount * step; i += step) {
@@ -168,8 +167,6 @@ Berikan diagnosa dalam format JSON murni tanpa pembungkus teks tambahan, dengan 
         darkPixels++;
       } else if (b > 185) {
         brightPixels++;
-      } else {
-        midPixels++;
       }
     }
 

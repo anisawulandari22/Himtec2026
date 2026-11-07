@@ -900,8 +900,9 @@ class _MarketScreenState extends State<MarketScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildBannerMetric(String label, String value) {
     return Column(
@@ -1257,8 +1258,7 @@ class _MarketScreenState extends State<MarketScreen> {
           ),
         ],
       ),
-    ),
-  );
+    );
   }
 
   Widget _buildInputField({
