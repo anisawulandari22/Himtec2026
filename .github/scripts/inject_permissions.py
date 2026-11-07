@@ -1,4 +1,5 @@
 import os
+import xml.etree.ElementTree as ET
 
 manifest_path = "android/app/src/main/AndroidManifest.xml"
 if os.path.exists(manifest_path):
@@ -12,13 +13,17 @@ if os.path.exists(manifest_path):
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 """
-    if "android.permission.CAMERA" not in content:
-        content = content.replace("<manifest", "<manifest" + permissions, 1)
-        with open(manifest_path, "w", encoding="utf-8") as f:
-            f.write(content)
-        print("Camera and Internet permissions successfully injected into AndroidManifest.xml")
+    if "android.permission.CAMERA" not in content and "<application" in content:
+        new_content = content.replace("<application", permissions + "\n    <application", 1)
+        # Verify valid XML
+        try:
+            ET.fromstring(new_content)
+            with open(manifest_path, "w", encoding="utf-8") as f:
+                f.write(new_content)
+            print("Successfully injected permissions and verified AndroidManifest.xml is valid XML.")
+        except Exception as e:
+            print(f"Error validating XML: {e}, falling back to original content.")
     else:
-        print("Permissions already present in AndroidManifest.xml")
+        print("Permissions already present or <application tag not found.")
 else:
     print(f"Manifest not found at {manifest_path}")
-
