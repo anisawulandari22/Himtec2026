@@ -421,52 +421,6 @@ class _MarketScreenState extends State<MarketScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header Judul Halaman
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF196B4A),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(Icons.storefront_rounded, color: Colors.white, size: 24),
-                      ),
-                      const SizedBox(width: 12),
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'BURSA HARGA KOMODITAS REAL-TIME',
-                            style: TextStyle(
-                              color: Color(0xFF196B4A),
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.0,
-                            ),
-                          ),
-                          SizedBox(height: 2),
-                          Text(
-                            'Pasar & Simulasi Laba',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF17352B),
-                              letterSpacing: -0.3,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
               // 1. Selector Kota Interaktif Real-Time
               Container(
                 padding: const EdgeInsets.all(14),
@@ -555,33 +509,6 @@ class _MarketScreenState extends State<MarketScreen> {
                       child: const Text('Ganti Kota', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
                     ),
                   ],
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // Horizontal Quick-City Chips
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: MarketDataRepository.cities.take(6).map((city) {
-                    final isSelected = city.id == _selectedCity.id;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ActionChip(
-                        label: Text(city.name),
-                        backgroundColor: isSelected ? const Color(0xFF104B36) : Colors.white,
-                        side: BorderSide(
-                          color: isSelected ? const Color(0xFF104B36) : const Color(0xFFE2E8E3),
-                        ),
-                        labelStyle: TextStyle(
-                          fontSize: 11,
-                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                          color: isSelected ? Colors.white : const Color(0xFF17352B),
-                        ),
-                        onPressed: () => _onCityChanged(city),
-                      ),
-                    );
-                  }).toList(),
                 ),
               ),
               const SizedBox(height: 16),

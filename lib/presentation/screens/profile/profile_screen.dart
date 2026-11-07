@@ -47,46 +47,6 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
               ],
-              // Header Judul Profil
-              Row(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF196B4A),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.person_rounded, color: Colors.white, size: 24),
-                  ),
-                  const SizedBox(width: 12),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'AKUN TERVERIFIKASI',
-                        style: TextStyle(
-                          color: Color(0xFF196B4A),
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.0,
-                        ),
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        'Profil Praktisi AGL',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF17352B),
-                          letterSpacing: -0.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
             // Header Profile Card
             Container(
               width: double.infinity,

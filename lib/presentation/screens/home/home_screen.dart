@@ -114,53 +114,24 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Greeting & Quick Actions
+            // Header Quick Actions
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Builder(
-                      builder: (scaffoldContext) => InkWell(
+                Builder(
+                  builder: (scaffoldContext) => InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () => Scaffold.of(scaffoldContext).openDrawer(),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF196B4A),
                         borderRadius: BorderRadius.circular(12),
-                        onTap: () => Scaffold.of(scaffoldContext).openDrawer(),
-                        child: Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF196B4A),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(Icons.menu_rounded, color: Colors.white, size: 24),
-                        ),
                       ),
+                      child: const Icon(Icons.menu_rounded, color: Colors.white, size: 22),
                     ),
-                    const SizedBox(width: 12),
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'AGL • AGRICULTURE & LIVESTOCK',
-                          style: TextStyle(
-                            color: Color(0xFF196B4A),
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          'Halo, Praktisi AGL!',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF17352B),
-                            letterSpacing: -0.3,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
                 Row(
                   children: [
@@ -169,6 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       tooltip: 'Pindai Penyakit (AI)',
                       onPressed: () => context.push('/scan'),
                     ),
+                    const SizedBox(width: 4),
                     InkWell(
                       onTap: () {
                         Navigator.push(
@@ -178,10 +150,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         );
                       },
-                      borderRadius: BorderRadius.circular(22),
+                      borderRadius: BorderRadius.circular(20),
                       child: Container(
-                        width: 40,
-                        height: 40,
+                        width: 38,
+                        height: 38,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.white,
@@ -189,19 +161,19 @@ class _HomeScreenState extends State<HomeScreen> {
                           boxShadow: [
                             BoxShadow(
                               color: const Color(0xFF2C4C36).withValues(alpha: 0.08),
-                              blurRadius: 14,
-                              offset: const Offset(0, 5),
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
                             )
                           ],
                         ),
-                        child: const Icon(Icons.person_outline_rounded, color: Color(0xFF196B4A), size: 20),
+                        child: const Icon(Icons.person_outline_rounded, color: Color(0xFF196B4A), size: 18),
                       ),
                     ),
                   ],
                 ),
               ],
             ),
-          const SizedBox(height: 20),
+            const SizedBox(height: 14),
 
           // Weather Card
           Container(

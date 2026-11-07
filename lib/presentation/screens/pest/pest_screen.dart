@@ -14,24 +14,6 @@ class _PestScreenState extends State<PestScreen> {
   // 0: Penyakit Tanaman (Agriculture), 1: Penyakit Hewan Ternak (Livestock)
   int _diseaseSectorIndex = 0;
 
-  // Filter Kategori Tanaman
-  int _selectedCategoryIndex = 0;
-  final List<String> _categories = [
-    'Semua',
-    'Hama Padi & Pangan',
-    'Hama Hortikultura',
-    'Penyakit Jamur & Bakteri',
-    'Defisiensi Nutrisi',
-  ];
-
-  // Filter Kategori Ternak
-  int _selectedLivestockCategoryIndex = 0;
-  final List<String> _livestockCategories = [
-    'Semua',
-    'Ruminansia (Sapi/Kambing)',
-    'Unggas (Ayam/Bebek)',
-  ];
-
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
 
@@ -129,25 +111,21 @@ class _PestScreenState extends State<PestScreen> {
   Widget build(BuildContext context) {
     // Filter Tanaman
     final filteredPlantList = _pestData.where((item) {
-      final matchesCategory = _selectedCategoryIndex == 0 ||
-          item['category'] == _categories[_selectedCategoryIndex];
       final matchesSearch = _searchQuery.isEmpty ||
           item['title'].toLowerCase().contains(_searchQuery.toLowerCase()) ||
           item['affected'].toLowerCase().contains(_searchQuery.toLowerCase()) ||
           item['symptoms'].toLowerCase().contains(_searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
+      return matchesSearch;
     }).toList();
 
     // Filter Ternak
     final filteredLivestockList = LivestockProvider.diseases.where((item) {
-      final matchesCategory = _selectedLivestockCategoryIndex == 0 ||
-          item.category == _livestockCategories[_selectedLivestockCategoryIndex];
       final matchesSearch = _searchQuery.isEmpty ||
           item.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           item.latinName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           item.affected.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           item.symptoms.toLowerCase().contains(_searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
+      return matchesSearch;
     }).toList();
 
     return Scaffold(
@@ -159,56 +137,6 @@ class _PestScreenState extends State<PestScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header Judul Halaman
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF196B4A),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(Icons.pest_control_rounded, color: Colors.white, size: 24),
-                      ),
-                      const SizedBox(width: 12),
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'KATALOG & DIAGNOSA AGL',
-                            style: TextStyle(
-                              color: Color(0xFF196B4A),
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.0,
-                            ),
-                          ),
-                          SizedBox(height: 2),
-                          Text(
-                            'Hama & Penyakit',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF17352B),
-                              letterSpacing: -0.3,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.document_scanner_outlined, color: Color(0xFF196B4A), size: 24),
-                    tooltip: 'Pindai AI',
-                    onPressed: () => context.push('/scan'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
             // 1. Selector Sektor: Tanaman vs Ternak
             Container(
               padding: const EdgeInsets.all(4),
@@ -328,72 +256,7 @@ class _PestScreenState extends State<PestScreen> {
                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               ),
             ),
-            const SizedBox(height: 14),
-
-            // 3. Category Filter Chips
-            if (_diseaseSectorIndex == 0)
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: List.generate(_categories.length, (index) {
-                    final isSelected = _selectedCategoryIndex == index;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: FilterChip(
-                        label: Text(_categories[index]),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          setState(() => _selectedCategoryIndex = index);
-                        },
-                        showCheckmark: false,
-                        backgroundColor: Colors.white,
-                        selectedColor: const Color(0xFFEAF3E7),
-                        side: BorderSide(
-                          color: isSelected ? const Color(0xFF196B4A) : const Color(0xFFE2E8E3),
-                        ),
-                        labelStyle: TextStyle(
-                          fontSize: 12,
-                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                          color: isSelected ? const Color(0xFF196B4A) : const Color(0xFF72827C),
-                        ),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                    );
-                  }),
-                ),
-              )
-            else
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: List.generate(_livestockCategories.length, (index) {
-                    final isSelected = _selectedLivestockCategoryIndex == index;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: FilterChip(
-                        label: Text(_livestockCategories[index]),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          setState(() => _selectedLivestockCategoryIndex = index);
-                        },
-                        showCheckmark: false,
-                        backgroundColor: Colors.white,
-                        selectedColor: const Color(0xFFEAF3E7),
-                        side: BorderSide(
-                          color: isSelected ? const Color(0xFF196B4A) : const Color(0xFFE2E8E3),
-                        ),
-                        labelStyle: TextStyle(
-                          fontSize: 12,
-                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                          color: isSelected ? const Color(0xFF196B4A) : const Color(0xFF72827C),
-                        ),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
 
             // 4. Live AI Camera Diagnostic Card
             InkWell(
