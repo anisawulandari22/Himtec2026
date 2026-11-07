@@ -393,7 +393,7 @@ class _MarketScreenState extends State<MarketScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'BURSA KOMODITAS REAL-TIME',
+                            'BURSA HARGA KOMODITAS REAL-TIME',
                             style: TextStyle(
                               color: Color(0xFF196B4A),
                               fontSize: 9.5,
@@ -403,7 +403,7 @@ class _MarketScreenState extends State<MarketScreen> {
                           ),
                           SizedBox(height: 2),
                           Text(
-                            'Pasar & Kalkulator Hasil',
+                            'Pasar & Simulasi Laba',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w800,

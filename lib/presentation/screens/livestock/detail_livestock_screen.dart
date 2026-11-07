@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/livestock_provider.dart';
 import '../../../models/livestock_model.dart';
@@ -113,6 +114,258 @@ class _DetailLivestockScreenState extends State<DetailLivestockScreen> {
             child: const Text('Simpan'),
           ),
         ],
+      ),
+    );
+  }
+
+  void _openLivestockJournalModal(LivestockModel item) {
+    String? pickedImagePath;
+    final ImagePicker picker = ImagePicker();
+    final weightController = TextEditingController(text: item.currentWeightKg.toString());
+    final notesController = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (modalContext) => StatefulBuilder(
+        builder: (context, setModalState) {
+          Future<void> pickImage(ImageSource source) async {
+            try {
+              final XFile? file = await picker.pickImage(
+                source: source,
+                maxWidth: 1200,
+                maxHeight: 1200,
+                imageQuality: 85,
+              );
+              if (file != null) {
+                setModalState(() {
+                  pickedImagePath = file.path;
+                });
+              }
+            } catch (e) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Gagal mengambil gambar: ${e.toString()}'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
+            }
+          }
+
+          return Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
+              decoration: const BoxDecoration(
+                color: Color(0xFFFBFCF8),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 38,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFCBD3CE),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'JURNAL PERKEMBANGAN TERNAK',
+                              style: TextStyle(
+                                color: Color(0xFF196B4A),
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              item.name,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF17352B),
+                              ),
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.close, color: Color(0xFF17352B)),
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: const BorderSide(color: Color(0xFFE2E8E3)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Area Foto Perkembangan Hewan Ternak
+                    if (pickedImagePath != null && File(pickedImagePath!).existsSync())
+                      Container(
+                        height: 180,
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(bottom: 14),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: const Color(0xFFB8C7BD)),
+                          image: DecorationImage(
+                            image: FileImage(File(pickedImagePath!)),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        alignment: Alignment.topRight,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CircleAvatar(
+                            backgroundColor: Colors.black.withValues(alpha: 0.6),
+                            child: IconButton(
+                              icon: const Icon(Icons.refresh_rounded, color: Colors.white, size: 20),
+                              tooltip: 'Ganti Foto',
+                              onPressed: () => pickImage(ImageSource.camera),
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: const Color(0xFFB8C7BD), style: BorderStyle.solid),
+                          borderRadius: BorderRadius.circular(18),
+                          color: const Color(0xFFF5F8F1),
+                        ),
+                        child: Column(
+                          children: [
+                            const Icon(Icons.camera_alt_outlined, color: Color(0xFF196B4A), size: 32),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Ambil Foto Perkembangan Hewan',
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF17352B)),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Dokumentasikan postur, bulu, dan kondisi fisik ternak secara rutin',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 11, color: Color(0xFF72827C)),
+                            ),
+                            const SizedBox(height: 14),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ElevatedButton.icon(
+                                  onPressed: () => pickImage(ImageSource.camera),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF196B4A),
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                  icon: const Icon(Icons.camera_alt_rounded, size: 16),
+                                  label: const Text('Kamera', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                                ),
+                                const SizedBox(width: 10),
+                                OutlinedButton.icon(
+                                  onPressed: () => pickImage(ImageSource.gallery),
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(color: Color(0xFF196B4A)),
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                  icon: const Icon(Icons.photo_library_outlined, size: 16, color: Color(0xFF196B4A)),
+                                  label: const Text('Galeri', style: TextStyle(fontSize: 12, color: Color(0xFF196B4A), fontWeight: FontWeight.w700)),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: weightController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'Bobot Timbang Saat Ini (kg)',
+                        hintText: 'Contoh: 365',
+                        suffixText: 'kg',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: const BorderSide(color: Color(0xFFE2E8E3)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: notesController,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        labelText: 'Catatan Kesehatan & Nafsu Makan',
+                        hintText: 'Tuliskan nafsu makan, kondisi feses, pemberian vitamin, atau catatan kesehatan hari ini...',
+                        hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF89948F), height: 1.4),
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: const BorderSide(color: Color(0xFFE2E8E3)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          final double? newW = double.tryParse(weightController.text.trim());
+                          if (newW != null && newW > 0) {
+                            context.read<LivestockProvider>().updateWeight(item.id, newW);
+                          }
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Catatan perkembangan & foto ${item.name} berhasil disimpan ke jurnal!'),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF196B4A),
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          elevation: 4,
+                        ),
+                        child: const Text(
+                          'Simpan Catatan Perkembangan Ternak',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -685,7 +938,30 @@ class _DetailLivestockScreenState extends State<DetailLivestockScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
+
+              // Tombol Aksi Catat Perkembangan Ternak
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _openLivestockJournalModal(item),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF104B36),
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      elevation: 4,
+                    ),
+                    icon: const Icon(Icons.camera_alt_outlined, color: Colors.white, size: 18),
+                    label: const Text(
+                      'Catat Perkembangan Ternak',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 28),
             ],
           ),
         ),

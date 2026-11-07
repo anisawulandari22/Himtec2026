@@ -279,7 +279,7 @@ class _AddLivestockBottomSheetState extends State<AddLivestockBottomSheet> {
                     children: [
                       // Preset Cepat
                       Text(
-                        'TEMPLATE CEPAT HEWAN TERNAK NUSANTARA',
+                        'PILIH PRESET TERNAK NUSANTARA (OPSIONAL)',
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
@@ -607,7 +607,7 @@ class _AddLivestockBottomSheetState extends State<AddLivestockBottomSheet> {
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
-                          child: const Text('Simpan ke Data Kandang', style: TextStyle(fontWeight: FontWeight.bold)),
+                          child: const Text('Simpan Data Ternak ke Kandang', style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ],

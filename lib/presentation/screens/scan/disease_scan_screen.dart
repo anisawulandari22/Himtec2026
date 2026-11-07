@@ -503,7 +503,7 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Text(
-                  'Arahkan daun atau bagian tanaman ke dalam kotak fokus',
+                  'Arahkan daun atau bagian tanaman bergejala ke dalam kotak pemindai',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,

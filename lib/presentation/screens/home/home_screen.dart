@@ -305,7 +305,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Peringatan cuaca panas',
+                        'Peringatan Suhu Panas & Evaporasi',
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 13,
@@ -314,7 +314,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       SizedBox(height: 3),
                       Text(
-                        'Risiko tinggi hari ini. Lindungi tomat dan selada dari paparan terik sinar matahari langsung.',
+                        'Indeks suhu tinggi terdeteksi di wilayah Anda. Pastikan kecukupan irigasi dan lindungi bibit muda dari terik matahari langsung.',
                         style: TextStyle(fontSize: 12, color: Color(0xFFA26250), height: 1.4),
                       ),
                     ],
@@ -378,7 +378,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         SizedBox(height: 3),
                         Text(
-                          'Buka kamera langsung untuk deteksi hama & infeksi dengan Gemini AI',
+                          'Buka kamera langsung untuk deteksi hama dan penyakit secara real-time',
                           style: TextStyle(fontSize: 11.5, color: Color(0xFFD6E8DE)),
                         ),
                       ],
@@ -535,7 +535,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
                   icon: const Icon(Icons.add_rounded, size: 16),
-                  label: const Text('Tambah', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  label: const Text('Tambah Tanaman', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                 ),
               ],
             ),

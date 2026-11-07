@@ -293,7 +293,7 @@ class _AddCropBottomSheetState extends State<AddCropBottomSheet> {
 
                 // Preset Cepat Komoditas Nusantara
                 Text(
-                  'ATAU PILIH TEMPLATE TANAMAN CEPAT',
+                  'PILIH TEMPLATE KOMODITAS NUSANTARA (OPSIONAL)',
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
@@ -331,7 +331,7 @@ class _AddCropBottomSheetState extends State<AddCropBottomSheet> {
                   controller: _nameController,
                   decoration: const InputDecoration(
                     labelText: 'Nama Tanaman',
-                    hintText: 'Misal: Padi Inpari 32 / Cabai Rawit',
+                    hintText: 'Contoh: Padi Inpari 32, Cabai Rawit Merah',
                     prefixIcon: Icon(Icons.eco_outlined),
                   ),
                   validator: (val) =>
@@ -342,7 +342,7 @@ class _AddCropBottomSheetState extends State<AddCropBottomSheet> {
                   controller: _categoryController,
                   decoration: const InputDecoration(
                     labelText: 'Fase Pertumbuhan',
-                    hintText: 'Misal: Fase vegetatif / anakan',
+                    hintText: 'Contoh: Fase Vegetatif, Pembungaan, Pembuahan',
                     prefixIcon: Icon(Icons.category_outlined),
                   ),
                 ),
@@ -352,7 +352,7 @@ class _AddCropBottomSheetState extends State<AddCropBottomSheet> {
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: 'Estimasi Masa Tanam (Hari)',
-                    hintText: '115',
+                    hintText: 'Contoh: 115',
                     prefixIcon: Icon(Icons.calendar_today_outlined),
                   ),
                 ),
@@ -361,7 +361,7 @@ class _AddCropBottomSheetState extends State<AddCropBottomSheet> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: _submit,
-                    child: const Text('Simpan ke Kebun / Sawah'),
+                    child: const Text('Simpan Data Tanaman ke Kebun'),
                   ),
                 ),
               ],
