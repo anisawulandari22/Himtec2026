@@ -83,14 +83,34 @@ class ScanResultSheet extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'HASIL DIAGNOSA ${result.aiEngine.toUpperCase()}',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: colorScheme.primary,
-                        letterSpacing: 1.2,
-                      ),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF196B4A).withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            result.sector.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w800,
+                              color: colorScheme.primary,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '• ${result.aiEngine}',
+                          style: TextStyle(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w600,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -256,7 +276,12 @@ class ScanResultSheet extends StatelessWidget {
 
                 // Organic Solutions Section
                 if (result.organicSolutions.isNotEmpty) ...[
-                  _buildSectionHeader('SOLUSI ORGANIK & PENANGANAN SEGERA', colorScheme),
+                  _buildSectionHeader(
+                    result.isLivestock
+                        ? 'PROTOKOL DARURAT & PENANGANAN VETERINER'
+                        : 'SOLUSI ORGANIK & PENANGANAN SEGERA',
+                    colorScheme,
+                  ),
                   const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.all(14),
@@ -296,7 +321,12 @@ class ScanResultSheet extends StatelessWidget {
 
                 // Prevention Tips Section
                 if (result.preventionTips.isNotEmpty) ...[
-                  _buildSectionHeader('LANGKAH PENCEGAHAN JANGKA PANJANG', colorScheme),
+                  _buildSectionHeader(
+                    result.isLivestock
+                        ? 'LANGKAH BIOSEKURITI & PENCEGAHAN KANDANG'
+                        : 'LANGKAH PENCEGAHAN JANGKA PANJANG',
+                    colorScheme,
+                  ),
                   const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.all(14),

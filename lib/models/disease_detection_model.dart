@@ -1,16 +1,17 @@
 class DiseaseDetectionResult {
-  final String cropName;
+  final String cropName; // Menyimpan nama tanaman atau nama jenis hewan ternak
   final String condition;
   final String diseaseName;
-  final String severity; // Normal, Rendah, Sedang, Kritis
+  final String severity; // Normal, Rendah, Sedang, Kritis, Tinggi
   final int confidence; // e.g. 95%
   final List<String> symptoms;
-  final List<String> organicSolutions;
+  final List<String> organicSolutions; // Solusi hayati/organik atau protokol darurat veteriner
   final List<String> preventionTips;
   final String summary;
   final DateTime scannedAt;
   final String? imagePath;
   final String aiEngine;
+  final String sector; // 'Pertanian' atau 'Peternakan'
 
   DiseaseDetectionResult({
     required this.cropName,
@@ -24,20 +25,41 @@ class DiseaseDetectionResult {
     required this.summary,
     required this.scannedAt,
     this.imagePath,
-    this.aiEngine = 'Real-Time Vision AI Engine',
+    this.aiEngine = 'AGL Agro-Veterinary AI Engine',
+    this.sector = 'Pertanian',
   });
+
+  bool get isLivestock => sector == 'Peternakan';
 
   factory DiseaseDetectionResult.fromJson(
     Map<String, dynamic> json, {
     String? imagePath,
-    String aiEngine = 'Real-Time Vision AI Engine',
+    String aiEngine = 'AGL Agro-Veterinary AI Engine',
+    String defaultSector = 'Pertanian',
   }) {
+    final name = json['cropName']?.toString() ??
+        json['subjectName']?.toString() ??
+        (defaultSector == 'Peternakan' ? 'Hewan Ternak' : 'Tanaman Agrikultur');
+
+    // Deteksi otomatis sektor jika tidak eksplisit dalam JSON
+    final explicitSector = json['sector']?.toString();
+    final inferredSector = explicitSector ??
+        ((name.toLowerCase().contains('sapi') ||
+                name.toLowerCase().contains('kambing') ||
+                name.toLowerCase().contains('domba') ||
+                name.toLowerCase().contains('ayam') ||
+                name.toLowerCase().contains('bebek') ||
+                name.toLowerCase().contains('unggas') ||
+                name.toLowerCase().contains('ternak'))
+            ? 'Peternakan'
+            : defaultSector);
+
     return DiseaseDetectionResult(
-      cropName: json['cropName']?.toString() ?? 'Tanaman Agrikultur',
-      condition: json['condition']?.toString() ?? 'Terdeteksi Pola Patogen',
-      diseaseName: json['diseaseName']?.toString() ?? 'Pemeriksaan Visual AI',
+      cropName: name,
+      condition: json['condition']?.toString() ?? 'Pemeriksaan Kesehatan',
+      diseaseName: json['diseaseName']?.toString() ?? 'Analisis Visual AI',
       severity: json['severity']?.toString() ?? 'Sedang',
-      confidence: (json['confidence'] is num) ? (json['confidence'] as num).toInt() : 92,
+      confidence: (json['confidence'] is num) ? (json['confidence'] as num).toInt() : 94,
       symptoms: (json['symptoms'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
@@ -45,15 +67,19 @@ class DiseaseDetectionResult {
       organicSolutions: (json['organicSolutions'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
+          (json['treatments'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
           [],
       preventionTips: (json['preventionTips'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
-      summary: json['summary']?.toString() ?? 'Hasil diagnosa terkalibrasi kecerdasan buatan.',
+      summary: json['summary']?.toString() ?? 'Diagnosa terkalibrasi sistem kecerdasan buatan.',
       scannedAt: DateTime.now(),
       imagePath: imagePath,
       aiEngine: json['aiEngine']?.toString() ?? aiEngine,
+      sector: inferredSector,
     );
   }
 
@@ -71,6 +97,7 @@ class DiseaseDetectionResult {
       'scannedAt': scannedAt.toIso8601String(),
       'imagePath': imagePath,
       'aiEngine': aiEngine,
+      'sector': sector,
     };
   }
 }

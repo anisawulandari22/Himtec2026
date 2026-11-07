@@ -22,6 +22,9 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
   FlashMode _currentFlashMode = FlashMode.off;
   final ImagePicker _imagePicker = ImagePicker();
 
+  // Pemilihan Sektor Pemindaian: Tanaman (Pertanian) vs Hewan Ternak (Peternakan)
+  ScanSector _selectedSector = ScanSector.plant;
+
   late AnimationController _scannerAnimController;
   late Animation<double> _scannerAnimation;
 
@@ -143,8 +146,9 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
         imageBytes = await photo.readAsBytes();
       }
 
-      final result = await GeminiService.analyzeCropDisease(
+      final result = await GeminiService.analyzeDisease(
         imageBytes: imageBytes,
+        sector: _selectedSector,
         imagePath: imagePath,
       );
 
@@ -181,8 +185,9 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
       setState(() => _isAnalyzing = true);
 
       final bytes = await photo.readAsBytes();
-      final result = await GeminiService.analyzeCropDisease(
+      final result = await GeminiService.analyzeDisease(
         imageBytes: bytes,
+        sector: _selectedSector,
         imagePath: photo.path,
       );
 
@@ -230,7 +235,7 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
           children: [
             Icon(Icons.key_rounded, color: Color(0xFF196B4A), size: 22),
             SizedBox(width: 8),
-            Text('API Key Gemini', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text('API Key Gemini Cloud', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           ],
         ),
         content: Column(
@@ -238,7 +243,7 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Aplikasi telah aktif dengan Real-Time Vision AI Engine bawaan. Anda juga dapat menghubungkan Google Gemini API Key gratis sebagai opsi cloud tambahan:',
+              'Aplikasi telah terintegrasi dengan AGL Agro-Veterinary AI Vision Engine bawaan (offline & real-time). Anda juga dapat menghubungkan API Key Google Gemini (2.0 Flash / 1.5 Flash) gratis dari Google AI Studio:',
               style: TextStyle(fontSize: 12, color: Color(0xFF56625D)),
             ),
             const SizedBox(height: 12),
@@ -246,14 +251,14 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
               controller: controller,
               decoration: InputDecoration(
                 hintText: 'Tempel AIzaSy...',
-                labelText: 'Gemini API Key',
+                labelText: 'Google Gemini API Key',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               ),
             ),
             const SizedBox(height: 8),
             const Text(
-              'Tips: Dapatkan kunci gratis tanpa kartu kredit di https://aistudio.google.com/',
+              'Dapatkan gratis tanpa kartu kredit di https://aistudio.google.com/',
               style: TextStyle(fontSize: 10.5, color: Color(0xFF72827C)),
             ),
           ],
@@ -409,7 +414,7 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
             ),
           ),
 
-          // 3. Top Controls (Back, Flash, Real-Time AI Badge)
+          // 3. Top Controls Bar
           SafeArea(
             child: Align(
               alignment: Alignment.topCenter,
@@ -447,7 +452,7 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
                           ),
                           const SizedBox(width: 7),
                           Text(
-                            GeminiService.hasCustomKey ? 'Gemini 1.5 Flash Aktif' : 'AI Real-Time Vision Aktif',
+                            GeminiService.hasCustomKey ? 'Gemini Flash AI Cloud' : 'Agro-Vet Vision AI Aktif',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 11,
@@ -490,24 +495,117 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
             ),
           ),
 
-          // 4. Instructional Banner
+          // 4. Selector Sektor Pemindaian (Tanaman vs Hewan Ternak)
           Positioned(
-            top: 100,
+            top: 72,
+            left: 20,
+            right: 20,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.70),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => setState(() => _selectedSector = ScanSector.plant),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: _selectedSector == ScanSector.plant
+                              ? const Color(0xFF196B4A)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.eco_rounded,
+                              size: 15,
+                              color: _selectedSector == ScanSector.plant ? Colors.white : Colors.white70,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Pindai Tanaman',
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: _selectedSector == ScanSector.plant
+                                    ? FontWeight.w800
+                                    : FontWeight.w600,
+                                color: _selectedSector == ScanSector.plant ? Colors.white : Colors.white70,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => setState(() => _selectedSector = ScanSector.livestock),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: _selectedSector == ScanSector.livestock
+                              ? const Color(0xFF196B4A)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.pets_rounded,
+                              size: 15,
+                              color: _selectedSector == ScanSector.livestock ? Colors.white : Colors.white70,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Pindai Ternak',
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: _selectedSector == ScanSector.livestock
+                                    ? FontWeight.w800
+                                    : FontWeight.w600,
+                                color: _selectedSector == ScanSector.livestock ? Colors.white : Colors.white70,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // 5. Instructional Guide Banner
+          Positioned(
+            top: 124,
             left: 20,
             right: 20,
             child: Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.65),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text(
-                  'Arahkan daun atau bagian tanaman bergejala ke dalam kotak pemindai',
+                child: Text(
+                  _selectedSector == ScanSector.livestock
+                      ? 'Arahkan kamera ke mata, mulut, kuku, kulit, feses, atau tubuh ternak'
+                      : 'Arahkan kamera ke daun, batang, atau buah tanaman yang bergejala',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 12,
+                    fontSize: 11.5,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -515,7 +613,7 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
             ),
           ),
 
-          // 5. Analyzing Loading Indicator Overlay
+          // 6. Analyzing Loading Indicator Overlay
           if (_isAnalyzing)
             Container(
               color: Colors.black.withValues(alpha: 0.75),
@@ -527,10 +625,10 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(color: const Color(0xFF196B4A)),
                   ),
-                  child: const Column(
+                  child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         width: 44,
                         height: 44,
                         child: CircularProgressIndicator(
@@ -538,19 +636,23 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
                           strokeWidth: 3,
                         ),
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       Text(
-                        'Mendiagnosa dengan Gemini AI...',
-                        style: TextStyle(
+                        _selectedSector == ScanSector.livestock
+                            ? 'Mendiagnosa Kesehatan Ternak...'
+                            : 'Mendiagnosa Penyakit Tanaman...',
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        'Menganalisis tanda bercak, hama, & patogen daun',
-                        style: TextStyle(color: Color(0xFFA1ADA5), fontSize: 11),
+                        _selectedSector == ScanSector.livestock
+                            ? 'Menganalisis lesi klinis, mukosa, & patogen ternak'
+                            : 'Menganalisis tanda bercak daun, hama, & patogen tanaman',
+                        style: const TextStyle(color: Color(0xFFA1ADA5), fontSize: 11),
                       ),
                     ],
                   ),
@@ -558,7 +660,7 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
               ),
             ),
 
-          // 6. Bottom Controls Bar
+          // 7. Bottom Controls Bar
           SafeArea(
             child: Align(
               alignment: Alignment.bottomCenter,
@@ -599,34 +701,26 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
                               color: Color(0xFF196B4A),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(
-                              Icons.document_scanner_rounded,
-                              color: Colors.white,
-                              size: 36,
-                            ),
+                            child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 32),
                           ),
                         ),
                       ),
                     ),
 
-                    // Tombol Kamera Ulang / Info
-                    InkWell(
-                      onTap: () {
-                        if (_cameraController != null) {
-                          _initializeCamera();
-                        } else {
-                          _captureAndAnalyze();
-                        }
-                      },
-                      borderRadius: BorderRadius.circular(30),
-                      child: Container(
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.flip_camera_ios_outlined, color: Colors.white, size: 24),
+                    // Indikator Sektor Aktif
+                    Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        _selectedSector == ScanSector.livestock
+                            ? Icons.pets_rounded
+                            : Icons.eco_rounded,
+                        color: Colors.white,
+                        size: 24,
                       ),
                     ),
                   ],
@@ -640,26 +734,21 @@ class _DiseaseScanScreenState extends State<DiseaseScanScreen>
   }
 
   Widget _buildCorner({required bool isTop, required bool isLeft}) {
+    const size = 24.0;
+    const thickness = 3.5;
+    const color = Color(0xFF7CD9B5);
+
     return Container(
-      width: 24,
-      height: 24,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         border: Border(
-          top: isTop
-              ? const BorderSide(color: Color(0xFF7CD9B5), width: 3.5)
-              : BorderSide.none,
-          bottom: !isTop
-              ? const BorderSide(color: Color(0xFF7CD9B5), width: 3.5)
-              : BorderSide.none,
-          left: isLeft
-              ? const BorderSide(color: Color(0xFF7CD9B5), width: 3.5)
-              : BorderSide.none,
-          right: !isLeft
-              ? const BorderSide(color: Color(0xFF7CD9B5), width: 3.5)
-              : BorderSide.none,
+          top: isTop ? const BorderSide(color: color, width: thickness) : BorderSide.none,
+          bottom: !isTop ? const BorderSide(color: color, width: thickness) : BorderSide.none,
+          left: isLeft ? const BorderSide(color: color, width: thickness) : BorderSide.none,
+          right: !isLeft ? const BorderSide(color: color, width: thickness) : BorderSide.none,
         ),
       ),
     );
   }
 }
-
