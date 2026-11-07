@@ -38,25 +38,7 @@ jobs:
         run: |
           rm -rf android
           flutter create . --platforms=android --org=org.agl --project-name=agl_app
-          python3 -c '
-          import os
-          manifest_path = "android/app/src/main/AndroidManifest.xml"
-          if os.path.exists(manifest_path):
-              with open(manifest_path, "r") as f:
-                  content = f.read()
-              perms = """
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
-    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
-"""
-              if "android.permission.CAMERA" not in content:
-                  content = content.replace("<manifest", "<manifest" + perms, 1)
-                  with open(manifest_path, "w") as f:
-                      f.write(content)
-                  print("Camera and Internet permissions successfully added to AndroidManifest.xml")
-          '
+          python3 .github/scripts/inject_permissions.py
 
       - name: Get Dependencies
         run: flutter pub get
