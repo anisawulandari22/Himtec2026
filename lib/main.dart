@@ -9,11 +9,13 @@ import 'core/providers/crop_provider.dart';
 import 'core/providers/livestock_provider.dart';
 import 'core/providers/growth_record_provider.dart';
 import 'core/router/app_router.dart';
+import 'core/services/gemini_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await GeminiService.init();
 
   // Enforce consistent edge-to-edge transparent system overlay
   SystemChrome.setSystemUIOverlayStyle(

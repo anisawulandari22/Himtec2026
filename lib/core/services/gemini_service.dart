@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import '../../models/disease_detection_model.dart';
+import 'storage_service.dart';
 
 enum ScanSector {
   plant,
@@ -11,32 +12,103 @@ enum ScanSector {
 class GeminiService {
   GeminiService._();
 
-  // API Key kustom pengguna jika disetel dari pengaturan aplikasi
   static String _apiKey = '';
+  static String? _lastCloudError;
 
   static String get apiKey => _apiKey;
   static bool get hasCustomKey => _apiKey.trim().isNotEmpty;
+  static String? get lastCloudError => _lastCloudError;
 
-  static void setApiKey(String key) {
-    _apiKey = key.trim();
+  static Future<void> init() async {
+    final savedKey = await StorageService.getGeminiApiKey();
+    if (savedKey != null && savedKey.trim().isNotEmpty) {
+      _apiKey = savedKey.trim();
+    }
   }
 
-  // Model Gemini Generasi Terbaru (2.0 Flash & 1.5 Flash)
-  static const String _primaryModel = 'gemini-2.0-flash';
-  static const String _fallbackModel = 'gemini-1.5-flash';
+  static Future<void> setApiKey(String key) async {
+    _apiKey = key.trim();
+    _lastCloudError = null;
+    await StorageService.saveGeminiApiKey(_apiKey);
+  }
+
+  // Model Gemini Vision yang dicoba secara berurutan
+  static const List<String> _visionModels = [
+    'gemini-1.5-flash',
+    'gemini-2.0-flash',
+    'gemini-1.5-pro',
+  ];
   static const String _baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models';
 
-  /// Diagnosa utama yang memisahkan dan menyesuaikan secara spesifik antara Tanaman dan Hewan Ternak
+  /// Uji coba koneksi API Key ke server Google Gemini
+  static Future<Map<String, dynamic>> testApiKey(String testKey) async {
+    final cleanKey = testKey.trim();
+    if (cleanKey.isEmpty) {
+      return {'success': false, 'message': 'API Key masih kosong.'};
+    }
+
+    try {
+      final url = Uri.parse('$_baseUrl/gemini-1.5-flash:generateContent?key=$cleanKey');
+      final body = {
+        'contents': [
+          {
+            'parts': [
+              {'text': 'Ping. Balas dengan kata PONG saja.'}
+            ]
+          }
+        ]
+      };
+
+      final response = await http
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 12));
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': 'API Key Google Gemini berhasil terhubung & aktif (Model: Gemini 1.5/2.0 Flash)!'
+        };
+      } else {
+        String detail = 'Status ${response.statusCode}';
+        try {
+          final errJson = jsonDecode(response.body) as Map<String, dynamic>;
+          if (errJson.containsKey('error') && errJson['error'] is Map) {
+            detail = errJson['error']['message']?.toString() ?? detail;
+          }
+        } catch (_) {}
+        return {
+          'success': false,
+          'message': 'Google API menolak: $detail'
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Koneksi gagal: ${e.toString()}'
+      };
+    }
+  }
+
+  /// Diagnosa utama pemisahan antara Tanaman dan Hewan Ternak
   static Future<DiseaseDetectionResult> analyzeDisease({
     required Uint8List imageBytes,
     required ScanSector sector,
     String mimeType = 'image/jpeg',
     String? imagePath,
   }) async {
+    if (_apiKey.isEmpty) {
+      await init();
+    }
+
     final keyToUse = _apiKey.trim();
 
-    // 1. Coba panggil Cloud AI jika API key tersedia
+    // 1. Panggil Cloud AI jika API key tersedia
     if (keyToUse.isNotEmpty) {
+      _lastCloudError = null;
       try {
         final cloudResult = await _queryGeminiVision(
           keyToUse: keyToUse,
@@ -48,12 +120,41 @@ class GeminiService {
         if (cloudResult != null) {
           return cloudResult;
         }
-      } catch (_) {
-        // Fallback otomatis ke Agro-Veterinary AI Vision Engine lokal jika cloud gagal
+      } catch (e) {
+        _lastCloudError = e.toString();
       }
+
+      // Jika user sudah menyetel API Key namun Gemini gagal (misal API key salah atau kuota habis),
+      // beritahu pengguna secara jujur dan transparan mengapa Gemini gagal!
+      return DiseaseDetectionResult(
+        cropName: sector == ScanSector.livestock ? 'Pemeriksaan Ternak' : 'Pemeriksaan Tanaman',
+        condition: 'Kendala Koneksi Gemini AI',
+        diseaseName: 'Gagal Menghubungi Google Gemini',
+        severity: 'Sedang',
+        confidence: 0,
+        symptoms: [
+          'API Key Gemini Anda telah aktif, namun server Google mengembalikan respon gagal.',
+          'Rincian galat: ${_lastCloudError ?? 'Respon HTTP tidak valid atau batas waktu (timeout) terlampaui.'}',
+          'Periksa apakah API Key Google Gemini (AIzaSy...) valid dan fitur Generative Language API aktif.',
+        ],
+        organicSolutions: [
+          'Buka dialog API Key (ikon kunci) atau menu Pengaturan untuk memeriksa atau menguji ulang API Key Anda.',
+          'Pastikan perangkat terhubung dengan koneksi internet yang stabil.',
+          'Jika ingin menggunakan deteksi offline cepat tanpa internet, Anda dapat mengosongkan API Key di pengaturan.',
+        ],
+        preventionTips: [
+          'Dapatkan API Key baru secara gratis di Google AI Studio (https://aistudio.google.com/).',
+          'Pastikan kuota akun Google Anda belum melebihi limit harian.',
+        ],
+        summary: 'Google Gemini Cloud AI belum dapat memproses foto ini (${_lastCloudError ?? 'Error API'}). Periksa koneksi internet atau validitas API Key Anda.',
+        scannedAt: DateTime.now(),
+        imagePath: imagePath,
+        aiEngine: 'Google Gemini (Gagal Respon Cloud)',
+        sector: sector == ScanSector.livestock ? 'Peternakan' : 'Pertanian',
+      );
     }
 
-    // 2. Pemrosesan Real-Time Agro-Veterinary AI Vision Engine Terpadu
+    // 2. Jika tidak ada API Key yang disetel, gunakan engine deteksi cepat offline
     return _analyzeWithAgroVeterinaryVisionEngine(
       imageBytes,
       sector: sector,
@@ -106,16 +207,25 @@ class GeminiService {
       defaultSectorName = 'Peternakan';
       systemPrompt = '''
 Anda adalah dokter hewan (veterinarian) dan spesialis kesehatan peternakan terkemuka di Indonesia.
-Analisis foto hewan ternak ini (sapi potong/perah, kambing, domba, ayam broiler/layer, bebek).
-Jika ternak dalam kondisi sehat, sebutkan jenis ternak sehat dan rekomendasi pemeliharaan optimal.
-Jika terindikasi penyakit (seperti PMK/Foot and Mouth, Mastitis, Scabies, Kembung/Bloat, Tetelo/ND, Gumboro, Cacingan, dll.), identifikasi nama umum, nama taksonomi/patogen latin, tingkat keparahan, gejala klinis yang teramati, protokol pengobatan veteriner dan karantina darurat, serta biosekuriti kandang.
+Analisis foto ini secara objektif dan mendalam.
 
-Berikan diagnosa dalam format JSON murni tanpa pembungkus teks tambahan, dengan struktur wajib:
+INSTRUKSI EVALUASI:
+1. Verifikasi Objek: Jika foto BUKAN hewan ternak (misal foto manusia, benda mati, perabotan, atau pemandangan), kembalikan:
+   - "cropName": "Bukan Hewan Ternak"
+   - "condition": "Objek Tidak Sesuai"
+   - "diseaseName": "Objek Tidak Teridentifikasi"
+   - "severity": "Normal"
+   - "confidence": 0
+   - "summary": "Kamera tidak mendeteksi hewan ternak yang jelas. Arahkan lensa kamera langsung ke tubuh atau lesi hewan ternak."
+2. Jika Ternak Sehat: Tentukan jenis ternak (Sapi Potong, Sapi Perah, Kambing, Domba, Ayam Broiler, Ayam Petelur, Bebek). Tetapkan "condition": "Sehat & Bugar", "diseaseName": "Bebas Hama & Penyakit", "severity": "Normal", "confidence": 95+, sebutkan ciri fisik sehat yang teramati di foto, dan panduan perawatan optimal.
+3. Jika Terindikasi Penyakit/Parasit: Identifikasi secara akurat nama penyakit (PMK, Scabies, Mastitis, Kembung/Bloat, Tetelo/ND, Gumboro, Cacingan, dll.), patogen latin, keparahan (Rendah / Sedang / Kritis), gejala visual nyata, protokol penanganan darurat/obat veteriner, dan biosekuriti kandang.
+
+Berikan diagnosa dalam format JSON murni:
 {
   "sector": "Peternakan",
-  "cropName": "Jenis Ternak (contoh: Sapi Potong / Kambing Etawa / Ayam Broiler)",
+  "cropName": "Jenis Ternak (contoh: Sapi Limosin / Kambing Boer / Ayam Broiler)",
   "condition": "Sehat & Bugar / Terinfeksi Virus / Parasit Kulit / Gangguan Pencernaan / Infeksi Bakteri",
-  "diseaseName": "Nama Penyakit Ternak (Nama Latin Patogen)",
+  "diseaseName": "Nama Penyakit (Nama Latin Patogen)",
   "severity": "Normal / Rendah / Sedang / Kritis",
   "confidence": 95,
   "symptoms": [
@@ -137,15 +247,24 @@ Berikan diagnosa dalam format JSON murni tanpa pembungkus teks tambahan, dengan 
       defaultSectorName = 'Pertanian';
       systemPrompt = '''
 Anda adalah dokter spesialis proteksi tanaman, agronomis, dan fitopatolog terkemuka di Indonesia.
-Analisis foto daun atau bagian tanaman budidaya ini dengan cermat dan mendalam.
-Jika tanaman sehat, nyatakan tanaman sehat beserta saran pemupukan dan perawatan.
-Jika terinfeksi hama atau penyakit (seperti Antraknosa, Hawar Daun Bakteri, Virus Kuning Gemini, Busuk Daun Phytophthora, Blas Padi, Ulat Grayak, Thrips), jelaskan nama penyakit, patogen latin, tingkat keparahan, gejala visual, rekomendasi agens hayati/nabati ramah lingkungan, dan tips pencegahan budidaya.
+Analisis foto ini secara objektif dan mendalam.
 
-Berikan diagnosa dalam format JSON murni tanpa pembungkus teks tambahan, dengan struktur wajib:
+INSTRUKSI EVALUASI:
+1. Verifikasi Objek: Jika foto BUKAN tanaman/daun budidaya (misal foto manusia, perabotan, dinding, ruangan, kendaraan), kembalikan:
+   - "cropName": "Bukan Tanaman Budidaya"
+   - "condition": "Objek Tidak Sesuai"
+   - "diseaseName": "Objek Tidak Teridentifikasi"
+   - "severity": "Normal"
+   - "confidence": 0
+   - "summary": "Kamera tidak mendeteksi tanaman budidaya yang jelas. Arahkan lensa kamera langsung ke daun atau buah tanaman."
+2. Jika Tanaman Sehat: Tentukan jenis tanaman budidaya (Padi, Cabai, Jagung, Tomat, Bawang Merah, Pakcoy, Terung, dll.). Tetapkan "condition": "Sehat & Subur", "diseaseName": "Bebas Hama & Penyakit", "severity": "Normal", "confidence": 95+, sebutkan ciri visual daun/buah sehat yang tampak di foto, dan rekomendasi nutrisi.
+3. Jika Terindikasi Hama/Penyakit: Identifikasi penyakit (Antraknosa, Hawar Daun, Virus Kuning Gemini, Blas Padi, Busuk Daun, Ulat Grayak, Thrips, Kutu Kebul, Defisiensi Hara), nama latin patogen, keparahan (Rendah / Sedang / Kritis), gejala visual nyata, pengendalian hayati/organik, dan pencegahan budidaya.
+
+Berikan diagnosa dalam format JSON murni:
 {
   "sector": "Pertanian",
-  "cropName": "Nama Tanaman (contoh: Cabai Rawit / Padi Sawah / Tomat / Jagung)",
-  "condition": "Sehat / Terinfeksi Jamur / Hama Serangga / Bakteri / Defisiensi Hara",
+  "cropName": "Nama Tanaman (contoh: Cabai Rawit Merah / Padi Inpari / Jagung Hibrida)",
+  "condition": "Sehat & Subur / Terinfeksi Jamur / Hama Serangga / Bakteri / Defisiensi Hara",
   "diseaseName": "Nama Penyakit atau Hama (Nama Latin)",
   "severity": "Normal / Rendah / Sedang / Kritis",
   "confidence": 94,
@@ -166,10 +285,7 @@ Berikan diagnosa dalam format JSON murni tanpa pembungkus teks tambahan, dengan 
 ''';
     }
 
-    // Coba model primer (Gemini 2.0 Flash), jika gagal coba model sekunder (Gemini 1.5 Flash)
-    final modelsToTry = [_primaryModel, _fallbackModel];
-
-    for (final modelName in modelsToTry) {
+    for (final modelName in _visionModels) {
       try {
         final url = Uri.parse('$_baseUrl/$modelName:generateContent?key=$keyToUse');
 
@@ -188,7 +304,7 @@ Berikan diagnosa dalam format JSON murni tanpa pembungkus teks tambahan, dengan 
             }
           ],
           'generationConfig': {
-            'temperature': 0.2,
+            'temperature': 0.1,
             'responseMimeType': 'application/json',
           }
         };
@@ -199,7 +315,7 @@ Berikan diagnosa dalam format JSON murni tanpa pembungkus teks tambahan, dengan 
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode(requestBody),
             )
-            .timeout(const Duration(seconds: 14));
+            .timeout(const Duration(seconds: 25));
 
         if (response.statusCode == 200) {
           final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -214,14 +330,23 @@ Berikan diagnosa dalam format JSON murni tanpa pembungkus teks tambahan, dengan 
               return DiseaseDetectionResult.fromJson(
                 jsonMap,
                 imagePath: imagePath,
-                aiEngine: '$modelName Cloud AI',
+                aiEngine: 'Google Gemini ($modelName Cloud AI)',
                 defaultSector: defaultSectorName,
               );
             }
           }
+        } else {
+          String errMsg = 'Status ${response.statusCode}';
+          try {
+            final errJson = jsonDecode(response.body) as Map<String, dynamic>;
+            if (errJson.containsKey('error') && errJson['error'] is Map) {
+              errMsg = errJson['error']['message']?.toString() ?? errMsg;
+            }
+          } catch (_) {}
+          _lastCloudError = '[$modelName] $errMsg';
         }
-      } catch (_) {
-        // Lanjut mencoba fallback model berikutnya
+      } catch (e) {
+        _lastCloudError = e.toString();
       }
     }
 
@@ -760,6 +885,13 @@ Berikan diagnosa dalam format JSON murni tanpa pembungkus teks tambahan, dengan 
     }
     if (result.endsWith('```')) {
       result = result.substring(0, result.length - 3);
+    }
+    result = result.trim();
+
+    final firstBrace = result.indexOf('{');
+    final lastBrace = result.lastIndexOf('}');
+    if (firstBrace != -1 && lastBrace != -1 && lastBrace > firstBrace) {
+      result = result.substring(firstBrace, lastBrace + 1);
     }
     return result.trim();
   }

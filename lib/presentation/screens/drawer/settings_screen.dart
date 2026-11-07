@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../core/services/gemini_service.dart';
 import '../../../core/theme/theme_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -104,6 +105,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ],
                 ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+
+          _buildSectionHeader(context, 'INTEGRASI AI & DIAGNOSA'),
+          const SizedBox(height: 10),
+          _buildSettingsContainer(
+            context,
+            children: [
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: GeminiService.hasCustomKey
+                        ? const Color(0xFF196B4A).withValues(alpha: 0.12)
+                        : colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.auto_awesome_rounded,
+                    color: GeminiService.hasCustomKey ? const Color(0xFF196B4A) : colorScheme.onSurfaceVariant,
+                    size: 20,
+                  ),
+                ),
+                title: const Text('Google Gemini API Key', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                subtitle: Text(
+                  GeminiService.hasCustomKey
+                      ? 'Tersambung (Gemini 1.5/2.0 Flash AI Aktif)'
+                      : 'Belum diatur (Menggunakan Mode Diagnosa Offline)',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: GeminiService.hasCustomKey ? const Color(0xFF196B4A) : colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+                onTap: () => _showApiKeyDialog(context),
               ),
             ],
           ),
@@ -218,6 +256,193 @@ class _SettingsScreenState extends State<SettingsScreen> {
         border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Column(children: children),
+    );
+  }
+
+  void _showApiKeyDialog(BuildContext context) {
+    final controller = TextEditingController(text: GeminiService.apiKey);
+    bool isTesting = false;
+    String? testResultMessage;
+    bool? testResultSuccess;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (dialogCtx, setDialogState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: const Row(
+              children: [
+                Icon(Icons.key_rounded, color: Color(0xFF196B4A), size: 22),
+                SizedBox(width: 8),
+                Text('Google Gemini API Key', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Hubungkan API Key Google Gemini (1.5 Flash / 2.0 Flash) untuk diagnosa penyakit tanaman dan ternak berbasis visual multimodal Google AI:',
+                    style: TextStyle(fontSize: 12, color: Color(0xFF56625D)),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: controller,
+                    decoration: InputDecoration(
+                      hintText: 'Tempel AIzaSy...',
+                      labelText: 'Google Gemini API Key',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      suffixIcon: controller.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear, size: 18),
+                              onPressed: () {
+                                controller.clear();
+                                setDialogState(() {
+                                  testResultMessage = null;
+                                  testResultSuccess = null;
+                                });
+                              },
+                            )
+                          : null,
+                    ),
+                    onChanged: (_) {
+                      setDialogState(() {
+                        testResultMessage = null;
+                        testResultSuccess = null;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Dapatkan gratis tanpa kartu kredit di https://aistudio.google.com/',
+                    style: TextStyle(fontSize: 10.5, color: Color(0xFF72827C)),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      onPressed: isTesting
+                          ? null
+                          : () async {
+                              final text = controller.text.trim();
+                              if (text.isEmpty) {
+                                setDialogState(() {
+                                  testResultMessage = 'Masukkan API Key terlebih dahulu.';
+                                  testResultSuccess = false;
+                                });
+                                return;
+                              }
+                              setDialogState(() {
+                                isTesting = true;
+                                testResultMessage = null;
+                              });
+                              final res = await GeminiService.testApiKey(text);
+                              setDialogState(() {
+                                isTesting = false;
+                                testResultSuccess = res['success'] == true;
+                                testResultMessage = res['message'] as String?;
+                              });
+                            },
+                      icon: isTesting
+                          ? const SizedBox(
+                              width: 14,
+                              height: 14,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.network_check_rounded, size: 18),
+                      label: Text(
+                        isTesting ? 'Menguji Koneksi...' : 'Uji Koneksi API Key',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ),
+                  if (testResultMessage != null) ...[
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: testResultSuccess == true
+                            ? const Color(0xFFE8F5E9)
+                            : const Color(0xFFFFEBEE),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: testResultSuccess == true
+                              ? const Color(0xFF4CAF50)
+                              : const Color(0xFFEF5350),
+                        ),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            testResultSuccess == true
+                                ? Icons.check_circle_outline
+                                : Icons.error_outline,
+                            size: 16,
+                            color: testResultSuccess == true
+                                ? const Color(0xFF2E7D32)
+                                : const Color(0xFFC62828),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              testResultMessage!,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: testResultSuccess == true
+                                    ? const Color(0xFF1B5E20)
+                                    : const Color(0xFFB71C1C),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Batal'),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF196B4A),
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () async {
+                  await GeminiService.setApiKey(controller.text);
+                  if (ctx.mounted) Navigator.pop(ctx);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          controller.text.trim().isNotEmpty
+                              ? 'API Key Gemini berhasil disimpan & siap digunakan!'
+                              : 'API Key dihapus. Aplikasi kembali ke mode offline.',
+                        ),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                    setState(() {});
+                  }
+                },
+                child: const Text('Simpan'),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

@@ -11,6 +11,7 @@ class StorageService {
   static const String _keyCrops = 'agl_crops_list_json';
   static const String _keyLivestock = 'agl_livestock_list_json';
   static const String _keyGrowthRecords = 'agl_growth_records_list_json';
+  static const String _keyGeminiApiKey = 'agl_gemini_api_key_str';
 
   // ===================== AUTH USER STORAGE =====================
   static Future<void> saveUser(UserModel user) async {
@@ -97,6 +98,17 @@ class StorageService {
     } catch (_) {
       return null;
     }
+  }
+
+  // ===================== GEMINI API KEY STORAGE =====================
+  static Future<void> saveGeminiApiKey(String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyGeminiApiKey, key.trim());
+  }
+
+  static Future<String?> getGeminiApiKey() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyGeminiApiKey);
   }
 }
 
