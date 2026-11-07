@@ -185,6 +185,15 @@ class CropProvider extends ChangeNotifier {
     StorageService.saveCrops(_crops);
   }
 
+  void updateCrop(CropModel updated) {
+    final index = _crops.indexWhere((c) => c.id == updated.id);
+    if (index != -1) {
+      _crops[index] = updated;
+      notifyListeners();
+      StorageService.saveCrops(_crops);
+    }
+  }
+
   void removeCrop(String id) {
     _crops.removeWhere((crop) => crop.id == id);
     notifyListeners();

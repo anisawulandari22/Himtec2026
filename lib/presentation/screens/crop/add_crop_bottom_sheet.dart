@@ -7,8 +7,9 @@ import '../../../models/crop_model.dart';
 
 class AddCropBottomSheet extends StatefulWidget {
   final Function(CropModel)? onCropAdded;
+  final CropModel? initialCrop;
 
-  const AddCropBottomSheet({super.key, this.onCropAdded});
+  const AddCropBottomSheet({super.key, this.onCropAdded, this.initialCrop});
 
   @override
   State<AddCropBottomSheet> createState() => _AddCropBottomSheetState();
@@ -24,6 +25,23 @@ class _AddCropBottomSheetState extends State<AddCropBottomSheet> {
   String _selectedImage = 'https://images.unsplash.com/photo-1594282484620-df6495d46101?w=300';
   String? _customImagePath;
   String _initialTask = 'Pemberian pupuk dan nutrisi awal';
+
+  bool get _isEditMode => widget.initialCrop != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final init = widget.initialCrop;
+    if (init != null) {
+      _nameController.text = init.name;
+      _categoryController.text = init.category;
+      _totalDaysController.text = init.totalDays.toString();
+      _selectedImage = init.imagePath;
+      if (init.tasks.isNotEmpty) {
+        _initialTask = init.tasks.first.title;
+      }
+    }
+  }
 
   final List<Map<String, dynamic>> _cropPresets = [
     {
@@ -119,29 +137,62 @@ class _AddCropBottomSheetState extends State<AddCropBottomSheet> {
   void _submit() {
     if (_formKey.currentState!.validate()) {
       final imageToSave = _customImagePath ?? _selectedImage;
-      final newCrop = CropModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        name: _nameController.text.trim(),
-        category: _categoryController.text.trim(),
-        imagePath: imageToSave,
-        currentDay: 1,
-        totalDays: int.tryParse(_totalDaysController.text.trim()) ?? 30,
-        progressPercent: 5,
-        healthStatus: 'Sehat',
-        tasks: [
-          TaskModel(
-            title: _initialTask,
-            subtitle: 'Tahap pertama',
-            isCompleted: false,
+      final provider = context.read<CropProvider>();
+
+      if (_isEditMode) {
+        final existing = widget.initialCrop!;
+        final updatedCrop = CropModel(
+          id: existing.id,
+          name: _nameController.text.trim(),
+          category: _categoryController.text.trim(),
+          imagePath: imageToSave,
+          currentDay: existing.currentDay,
+          totalDays: int.tryParse(_totalDaysController.text.trim()) ?? existing.totalDays,
+          progressPercent: existing.progressPercent,
+          healthStatus: existing.healthStatus,
+          tasks: existing.tasks,
+        );
+
+        provider.updateCrop(updatedCrop);
+        widget.onCropAdded?.call(updatedCrop);
+        Navigator.pop(context);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Data ${updatedCrop.name} berhasil diperbarui!'),
+            behavior: SnackBarBehavior.floating,
           ),
-        ],
-      );
+        );
+      } else {
+        final newCrop = CropModel(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          name: _nameController.text.trim(),
+          category: _categoryController.text.trim(),
+          imagePath: imageToSave,
+          currentDay: 1,
+          totalDays: int.tryParse(_totalDaysController.text.trim()) ?? 30,
+          progressPercent: 5,
+          healthStatus: 'Sehat',
+          tasks: [
+            TaskModel(
+              title: _initialTask,
+              subtitle: 'Tahap pertama',
+              isCompleted: false,
+            ),
+          ],
+        );
 
-      // Save to centralized CropProvider
-      context.read<CropProvider>().addCrop(newCrop);
+        provider.addCrop(newCrop);
+        widget.onCropAdded?.call(newCrop);
+        Navigator.pop(context);
 
-      widget.onCropAdded?.call(newCrop);
-      Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${newCrop.name} berhasil ditambahkan ke kebun!'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
@@ -182,7 +233,7 @@ class _AddCropBottomSheetState extends State<AddCropBottomSheet> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Tambah Tanaman Baru',
+                  _isEditMode ? 'Edit Data Tanaman' : 'Tambah Tanaman Baru',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -361,7 +412,7 @@ class _AddCropBottomSheetState extends State<AddCropBottomSheet> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: _submit,
-                    child: const Text('Simpan Data Tanaman ke Kebun'),
+                    child: Text(_isEditMode ? 'Simpan Perubahan Tanaman' : 'Simpan Data Tanaman ke Kebun'),
                   ),
                 ),
               ],

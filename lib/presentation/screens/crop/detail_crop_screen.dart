@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/crop_provider.dart';
 import '../../../models/crop_model.dart';
+import 'add_crop_bottom_sheet.dart';
 
 class DetailCropScreen extends StatefulWidget {
   final CropModel crop;
@@ -310,6 +311,15 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
     );
   }
 
+  void _openEditModal(BuildContext context, CropModel crop) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => AddCropBottomSheet(initialCrop: crop),
+    );
+  }
+
   ImageProvider _getImageProvider(String path) {
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return NetworkImage(path);
@@ -350,18 +360,41 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                         side: const BorderSide(color: Color(0xFFE2E8E3)),
                       ),
                     ),
-                    Text(
-                      'Detail ${currentCrop.name}',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    IconButton(
-                      onPressed: () => _confirmDelete(context, currentCrop),
-                      tooltip: 'Hapus Tanaman',
-                      icon: const Icon(Icons.delete_outline_rounded, size: 20, color: Colors.redAccent),
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        side: const BorderSide(color: Color(0xFFE2E8E3)),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Text(
+                          'Detail ${currentCrop.name}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
                       ),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: () => _openEditModal(context, currentCrop),
+                          tooltip: 'Edit Tanaman',
+                          icon: const Icon(Icons.edit_outlined, size: 19, color: Color(0xFF196B4A)),
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: const BorderSide(color: Color(0xFFE2E8E3)),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        IconButton(
+                          onPressed: () => _confirmDelete(context, currentCrop),
+                          tooltip: 'Hapus Tanaman',
+                          icon: const Icon(Icons.delete_outline_rounded, size: 19, color: Colors.redAccent),
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: const BorderSide(color: Color(0xFFE2E8E3)),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

@@ -6,7 +6,9 @@ import '../../../core/providers/livestock_provider.dart';
 import '../../../models/livestock_model.dart';
 
 class AddLivestockBottomSheet extends StatefulWidget {
-  const AddLivestockBottomSheet({super.key});
+  final LivestockModel? initialLivestock;
+
+  const AddLivestockBottomSheet({super.key, this.initialLivestock});
 
   @override
   State<AddLivestockBottomSheet> createState() => _AddLivestockBottomSheetState();
@@ -29,6 +31,28 @@ class _AddLivestockBottomSheetState extends State<AddLivestockBottomSheet> {
   String _selectedImage = 'https://images.unsplash.com/photo-1546445317-29f4545e9d53?w=400';
   String? _customImagePath;
   final ImagePicker _picker = ImagePicker();
+
+  bool get _isEditMode => widget.initialLivestock != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final init = widget.initialLivestock;
+    if (init != null) {
+      _tagController.text = init.tagNumber;
+      _nameController.text = init.name;
+      _breedController.text = init.breed;
+      _ageController.text = init.ageMonths.toString();
+      _currentWeightController.text = init.currentWeightKg.toString();
+      _targetWeightController.text = init.targetWeightKg.toString();
+      _forageController.text = init.feedRequirement.forageKgDaily.toString();
+      _concentrateController.text = init.feedRequirement.concentrateKgDaily.toString();
+      _waterController.text = init.feedRequirement.waterLitersDaily.toString();
+      _selectedCategory = init.category;
+      _selectedGender = init.gender;
+      _selectedImage = init.imagePath;
+    }
+  }
 
   Future<void> _pickImage(ImageSource source) async {
     try {
@@ -156,51 +180,88 @@ class _AddLivestockBottomSheetState extends State<AddLivestockBottomSheet> {
   void _submit() {
     if (_formKey.currentState!.validate()) {
       final imageToSave = _customImagePath ?? _selectedImage;
-      final newLivestock = LivestockModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        tagNumber: _tagController.text.trim(),
-        name: _nameController.text.trim(),
-        category: _selectedCategory,
-        breed: _breedController.text.trim().isEmpty ? _selectedCategory : _breedController.text.trim(),
-        gender: _selectedGender,
-        ageMonths: int.tryParse(_ageController.text.trim()) ?? 12,
-        currentWeightKg: double.tryParse(_currentWeightController.text.trim()) ?? 100,
-        targetWeightKg: double.tryParse(_targetWeightController.text.trim()) ?? 200,
-        healthStatus: 'Sehat',
-        imagePath: imageToSave,
-        feedRequirement: FeedRequirement(
-          forageKgDaily: double.tryParse(_forageController.text.trim()) ?? 10,
-          concentrateKgDaily: double.tryParse(_concentrateController.text.trim()) ?? 2,
-          waterLitersDaily: double.tryParse(_waterController.text.trim()) ?? 20,
-          vitaminsAndMinerals: [
-            'Premix Mineral & Vitamin Esensial harian',
-            'Suplemen vitamin A-D-E larut air',
+      final provider = context.read<LivestockProvider>();
+
+      if (_isEditMode) {
+        final existing = widget.initialLivestock!;
+        final updated = LivestockModel(
+          id: existing.id,
+          tagNumber: _tagController.text.trim(),
+          name: _nameController.text.trim(),
+          category: _selectedCategory,
+          breed: _breedController.text.trim().isEmpty ? _selectedCategory : _breedController.text.trim(),
+          gender: _selectedGender,
+          ageMonths: int.tryParse(_ageController.text.trim()) ?? existing.ageMonths,
+          currentWeightKg: double.tryParse(_currentWeightController.text.trim()) ?? existing.currentWeightKg,
+          targetWeightKg: double.tryParse(_targetWeightController.text.trim()) ?? existing.targetWeightKg,
+          healthStatus: existing.healthStatus,
+          imagePath: imageToSave,
+          feedRequirement: FeedRequirement(
+            forageKgDaily: double.tryParse(_forageController.text.trim()) ?? existing.feedRequirement.forageKgDaily,
+            concentrateKgDaily: double.tryParse(_concentrateController.text.trim()) ?? existing.feedRequirement.concentrateKgDaily,
+            waterLitersDaily: double.tryParse(_waterController.text.trim()) ?? existing.feedRequirement.waterLitersDaily,
+            vitaminsAndMinerals: existing.feedRequirement.vitaminsAndMinerals,
+            feedingSchedule: existing.feedRequirement.feedingSchedule,
+          ),
+          tasks: existing.tasks,
+        );
+
+        provider.updateLivestock(updated);
+        Navigator.pop(context);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Data ${updated.name} (${updated.tagNumber}) berhasil diperbarui!'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      } else {
+        final newLivestock = LivestockModel(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          tagNumber: _tagController.text.trim(),
+          name: _nameController.text.trim(),
+          category: _selectedCategory,
+          breed: _breedController.text.trim().isEmpty ? _selectedCategory : _breedController.text.trim(),
+          gender: _selectedGender,
+          ageMonths: int.tryParse(_ageController.text.trim()) ?? 12,
+          currentWeightKg: double.tryParse(_currentWeightController.text.trim()) ?? 100,
+          targetWeightKg: double.tryParse(_targetWeightController.text.trim()) ?? 200,
+          healthStatus: 'Sehat',
+          imagePath: imageToSave,
+          feedRequirement: FeedRequirement(
+            forageKgDaily: double.tryParse(_forageController.text.trim()) ?? 10,
+            concentrateKgDaily: double.tryParse(_concentrateController.text.trim()) ?? 2,
+            waterLitersDaily: double.tryParse(_waterController.text.trim()) ?? 20,
+            vitaminsAndMinerals: [
+              'Premix Mineral & Vitamin Esensial harian',
+              'Suplemen vitamin A-D-E larut air',
+            ],
+            feedingSchedule: 'Pemberian konsentrat pagi & sore, hijauan segar tersedia rutin',
+          ),
+          tasks: [
+            LivestockTaskModel(
+              title: 'Pemberian ransum pakan hijauan & konsentrat',
+              subtitle: 'Pagi hari',
+              isCompleted: false,
+            ),
+            LivestockTaskModel(
+              title: 'Pembersihan sanitasi kotoran kandang',
+              subtitle: 'Rutin harian',
+              isCompleted: false,
+            ),
           ],
-          feedingSchedule: 'Pemberian konsentrat pagi & sore, hijauan segar tersedia rutin',
-        ),
-        tasks: [
-          LivestockTaskModel(
-            title: 'Pemberian ransum pakan hijauan & konsentrat',
-            subtitle: 'Pagi hari',
-            isCompleted: false,
-          ),
-          LivestockTaskModel(
-            title: 'Pembersihan sanitasi kotoran kandang',
-            subtitle: 'Rutin harian',
-            isCompleted: false,
-          ),
-        ],
-      );
+        );
 
-      context.read<LivestockProvider>().addLivestock(newLivestock);
-      Navigator.pop(context);
+        provider.addLivestock(newLivestock);
+        Navigator.pop(context);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${newLivestock.name} (${newLivestock.tagNumber}) berhasil ditambahkan ke kandang!'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${newLivestock.name} (${newLivestock.tagNumber}) berhasil ditambahkan ke kandang!'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
@@ -242,7 +303,7 @@ class _AddLivestockBottomSheetState extends State<AddLivestockBottomSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'TAMBAH TERNAK BARU',
+                        _isEditMode ? 'EDIT DATA TERNAK' : 'TAMBAH TERNAK BARU',
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
@@ -252,7 +313,7 @@ class _AddLivestockBottomSheetState extends State<AddLivestockBottomSheet> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Input Data Hewan & Pakan',
+                        _isEditMode ? 'Perbarui Informasi Ternak' : 'Input Data Hewan & Pakan',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
@@ -607,7 +668,10 @@ class _AddLivestockBottomSheetState extends State<AddLivestockBottomSheet> {
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
-                          child: const Text('Simpan Data Ternak ke Kandang', style: TextStyle(fontWeight: FontWeight.bold)),
+                          child: Text(
+                            _isEditMode ? 'Simpan Perubahan Data Ternak' : 'Simpan Data Ternak ke Kandang',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
                     ],

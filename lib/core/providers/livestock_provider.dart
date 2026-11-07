@@ -229,6 +229,15 @@ class LivestockProvider extends ChangeNotifier {
     StorageService.saveLivestock(_livestock);
   }
 
+  void updateLivestock(LivestockModel updated) {
+    final index = _livestock.indexWhere((item) => item.id == updated.id);
+    if (index != -1) {
+      _livestock[index] = updated;
+      notifyListeners();
+      StorageService.saveLivestock(_livestock);
+    }
+  }
+
   void removeLivestock(String id) {
     _livestock.removeWhere((item) => item.id == id);
     notifyListeners();

@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/livestock_provider.dart';
 import '../../../models/livestock_model.dart';
+import 'add_livestock_bottom_sheet.dart';
 
 class DetailLivestockScreen extends StatefulWidget {
   final LivestockModel livestock;
@@ -370,6 +371,46 @@ class _DetailLivestockScreenState extends State<DetailLivestockScreen> {
     );
   }
 
+  void _confirmDelete(BuildContext context, LivestockModel animal) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hapus Hewan Ternak'),
+        content: Text('Apakah Anda yakin ingin menghapus "${animal.name}" (${animal.tagNumber}) dari kandang?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red[700]),
+            onPressed: () {
+              context.read<LivestockProvider>().removeLivestock(animal.id);
+              Navigator.pop(ctx); // Close dialog
+              Navigator.pop(context); // Back to HomeScreen
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${animal.name} berhasil dihapus dari kandang.'),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openEditModal(BuildContext context, LivestockModel animal) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => AddLivestockBottomSheet(initialLivestock: animal),
+    );
+  }
+
   ImageProvider _getImageProvider(String path) {
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return NetworkImage(path);
@@ -427,18 +468,50 @@ class _DetailLivestockScreenState extends State<DetailLivestockScreen> {
                         side: const BorderSide(color: Color(0xFFE2E8E3)),
                       ),
                     ),
-                    Text(
-                      'Ternak ${item.name}',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    IconButton(
-                      onPressed: () => _showUpdateWeightModal(context, item),
-                      icon: const Icon(Icons.scale_rounded, size: 20, color: Color(0xFF196B4A)),
-                      tooltip: 'Timbang Bobot',
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        side: const BorderSide(color: Color(0xFFE2E8E3)),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Text(
+                          'Ternak ${item.name}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
                       ),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: () => _showUpdateWeightModal(context, item),
+                          icon: const Icon(Icons.scale_rounded, size: 19, color: Color(0xFF196B4A)),
+                          tooltip: 'Timbang Bobot',
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: const BorderSide(color: Color(0xFFE2E8E3)),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        IconButton(
+                          onPressed: () => _openEditModal(context, item),
+                          icon: const Icon(Icons.edit_outlined, size: 19, color: Color(0xFF196B4A)),
+                          tooltip: 'Edit Data Ternak',
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: const BorderSide(color: Color(0xFFE2E8E3)),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        IconButton(
+                          onPressed: () => _confirmDelete(context, item),
+                          icon: const Icon(Icons.delete_outline_rounded, size: 19, color: Colors.redAccent),
+                          tooltip: 'Hapus Ternak',
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: const BorderSide(color: Color(0xFFE2E8E3)),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
