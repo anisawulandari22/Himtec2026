@@ -4,7 +4,7 @@ import '../models/crop_model.dart';
 class DetailCropScreen extends StatefulWidget {
   final CropModel crop;
 
-  const DetailCropScreen({Key? key, required this.crop}) : super(key: key);
+  const DetailCropScreen({super.key, required this.crop});
 
   @override
   State<DetailCropScreen> createState() => _DetailCropScreenState();
@@ -46,20 +46,32 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: const [
                       Text(
-                        "JURNAL HARIAN",
-                        style: TextStyle(color: Color(0xFF72827C), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+                        'JURNAL HARIAN',
+                        style: TextStyle(
+                          color: Color(0xFF72827C),
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                        ),
                       ),
                       SizedBox(height: 2),
                       Text(
-                        "Catat Perkembangan",
-                        style: TextStyle(fontFamily: 'Manrope', fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF17352B)),
+                        'Catat Perkembangan',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF17352B),
+                        ),
                       ),
                     ],
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
                     icon: const Icon(Icons.close, color: Color(0xFF17352B)),
-                    style: IconButton.styleFrom(backgroundColor: Colors.white, border: Border.all(color: const Color(0xFFE2E8E3))),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      side: const BorderSide(color: Color(0xFFE2E8E3)),
+                    ),
                   ),
                 ],
               ),
@@ -78,9 +90,12 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                   children: const [
                     Icon(Icons.camera_alt_outlined, color: Color(0xFF196B4A), size: 28),
                     SizedBox(height: 6),
-                    Text("Tambahkan foto tanaman", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF196B4A))),
+                    Text(
+                      'Tambahkan foto tanaman',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF196B4A)),
+                    ),
                     SizedBox(height: 2),
-                    Text("Ketuk untuk memilih dari perangkat", style: TextStyle(fontSize: 10, color: Color(0xFF72827C))),
+                    Text('Ketuk untuk memilih dari perangkat', style: TextStyle(fontSize: 10, color: Color(0xFF72827C))),
                   ],
                 ),
               ),
@@ -88,12 +103,18 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
               TextField(
                 maxLines: 3,
                 decoration: InputDecoration(
-                  hintText: "Bagaimana kondisi tanaman Anda hari ini?",
+                  hintText: 'Bagaimana kondisi tanaman Anda hari ini?',
                   hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF89948F)),
                   filled: true,
                   fillColor: Colors.white,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Color(0xFFE2E8E3))),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Color(0xFFE2E8E3))),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: const BorderSide(color: Color(0xFFE2E8E3)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: const BorderSide(color: Color(0xFFE2E8E3)),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -103,7 +124,7 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                   onPressed: () {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Perkembangan berhasil disimpan!")),
+                      const SnackBar(content: Text('Perkembangan berhasil disimpan!')),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -112,7 +133,10 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     elevation: 5,
                   ),
-                  child: const Text("Simpan perkembangan", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                  child: const Text(
+                    'Simpan perkembangan',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
                 ),
               ),
             ],
@@ -142,19 +166,19 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                       icon: const Icon(Icons.arrow_back_ios_new, size: 18),
                       style: IconButton.styleFrom(
                         backgroundColor: Colors.white,
-                        border: Border.all(color: const Color(0xFFE2E8E3)),
+                        side: const BorderSide(color: Color(0xFFE2E8E3)),
                       ),
                     ),
                     Text(
-                      "Detail ${widget.crop.name}",
-                      style: const TextStyle(fontFamily: 'Manrope', fontSize: 16, fontWeight: FontWeight.bold),
+                      'Detail ${widget.crop.name}',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     IconButton(
                       onPressed: () {},
                       icon: const Icon(Icons.bar_chart, size: 18),
                       style: IconButton.styleFrom(
                         backgroundColor: Colors.white,
-                        border: Border.all(color: const Color(0xFFE2E8E3)),
+                        side: const BorderSide(color: Color(0xFFE2E8E3)),
                       ),
                     ),
                   ],
@@ -189,13 +213,13 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "TANAMAN ANDA",
+                        'TANAMAN ANDA',
                         style: TextStyle(color: Color(0xFFDCEAC7), fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1.5),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         widget.crop.name,
-                        style: const TextStyle(fontFamily: 'Manrope', fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white),
+                        style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white),
                       ),
                       const SizedBox(height: 8),
                       Row(
@@ -206,7 +230,10 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                               color: Colors.white.withValues(alpha: 0.18),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: Text("Hari ke-${widget.crop.currentDay}", style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                            child: Text(
+                              'Hari ke-${widget.crop.currentDay}',
+                              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
                           ),
                           const SizedBox(width: 8),
                           Container(
@@ -217,9 +244,16 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                             ),
                             child: Row(
                               children: [
-                                Container(width: 6, height: 6, decoration: const BoxDecoration(color: Color(0xFF53A15C), shape: BoxShape.circle)),
+                                Container(
+                                  width: 6,
+                                  height: 6,
+                                  decoration: const BoxDecoration(color: Color(0xFF53A15C), shape: BoxShape.circle),
+                                ),
                                 const SizedBox(width: 5),
-                                Text(widget.crop.healthStatus, style: const TextStyle(color: Color(0xFF21583E), fontSize: 10, fontWeight: FontWeight.bold)),
+                                Text(
+                                  widget.crop.healthStatus,
+                                  style: const TextStyle(color: Color(0xFF21583E), fontSize: 10, fontWeight: FontWeight.bold),
+                                ),
                               ],
                             ),
                           ),
@@ -242,15 +276,15 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: const [
-                            Text("RUTINITAS HARIAN", style: TextStyle(color: Color(0xFF72827C), fontSize: 10, fontWeight: FontWeight.bold)),
+                            Text('RUTINITAS HARIAN', style: TextStyle(color: Color(0xFF72827C), fontSize: 10, fontWeight: FontWeight.bold)),
                             SizedBox(height: 2),
-                            Text("Tugas Hari Ini", style: TextStyle(fontFamily: 'Manrope', fontSize: 18, fontWeight: FontWeight.w800)),
+                            Text('Tugas Hari Ini', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
                           ],
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(color: const Color(0xFFE9F3DF), borderRadius: BorderRadius.circular(20)),
-                          child: const Text("1/2", style: TextStyle(color: Color(0xFF196B4A), fontSize: 11, fontWeight: FontWeight.bold)),
+                          child: const Text('1/2', style: TextStyle(color: Color(0xFF196B4A), fontSize: 11, fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
@@ -266,7 +300,7 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                           onTap: () {
                             setState(() {
                               task.isCompleted = !task.isCompleted;
-                              task.subtitle = task.isCompleted ? "Selesai" : "Belum selesai";
+                              task.subtitle = task.isCompleted ? 'Selesai' : 'Belum selesai';
                             });
                           },
                           borderRadius: BorderRadius.circular(15),
@@ -285,7 +319,10 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                                   decoration: BoxDecoration(
                                     color: task.isCompleted ? const Color(0xFF196B4A) : Colors.transparent,
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: task.isCompleted ? const Color(0xFF196B4A) : const Color(0xFFCCD6D0), width: 1.5),
+                                    border: Border.all(
+                                      color: task.isCompleted ? const Color(0xFF196B4A) : const Color(0xFFCCD6D0),
+                                      width: 1.5,
+                                    ),
                                   ),
                                   child: task.isCompleted ? const Icon(Icons.check, size: 16, color: Colors.white) : null,
                                 ),
@@ -341,10 +378,10 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: const [
-                                Text("Tips ahli hari ini", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF526921))),
+                                Text('Tips ahli hari ini', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF526921))),
                                 SizedBox(height: 4),
                                 Text(
-                                  "Pertahankan pH nutrisi sekitar 5,5 - 6,5 agar penyerapan akar pakcoy optimal.",
+                                  'Pertahankan pH nutrisi sekitar 5,5 - 6,5 agar penyerapan akar pakcoy optimal.',
                                   style: TextStyle(fontSize: 11.5, color: Color(0xFF697255), height: 1.4),
                                 ),
                               ],
@@ -367,7 +404,10 @@ class _DetailCropScreenState extends State<DetailCropScreen> {
                           elevation: 6,
                         ),
                         icon: const Icon(Icons.camera_alt_outlined, color: Colors.white, size: 18),
-                        label: const Text("Catat perkembangan hari ini", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                        label: const Text(
+                          'Catat perkembangan hari ini',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
                       ),
                     ),
                   ],

@@ -4,52 +4,50 @@ import 'package:flutter/services.dart';
 class AppTheme {
   AppTheme._();
 
-  // Color Palette - Light Mode
-  static const Color primaryLight = Color(0xFF1B4D3E); // Deep Forest / Pine Green
+  // Color Palette - Urban Farming Forest Green
+  static const Color primaryLight = Color(0xFF104B36); // Deep Forest Green
   static const Color onPrimaryLight = Color(0xFFFFFFFF);
-  static const Color primaryContainerLight = Color(0xFFD6E8DC);
-  static const Color onPrimaryContainerLight = Color(0xFF092E23);
+  static const Color primaryContainerLight = Color(0xFFEAF3E7); // Fresh Mint Sage
+  static const Color onPrimaryContainerLight = Color(0xFF104B36);
 
-  static const Color secondaryLight = Color(0xFF567258); // Muted Sage
+  static const Color secondaryLight = Color(0xFF196B4A); // Emerald Accent
   static const Color onSecondaryLight = Color(0xFFFFFFFF);
-  static const Color secondaryContainerLight = Color(0xFFDAE7DB);
-  static const Color onSecondaryContainerLight = Color(0xFF142017);
+  static const Color secondaryContainerLight = Color(0xFFE9F3DF);
+  static const Color onSecondaryContainerLight = Color(0xFF17352B);
 
-  static const Color tertiaryLight = Color(0xFF3B6470);
+  static const Color tertiaryLight = Color(0xFF526921); // Olive Sage
   static const Color onTertiaryLight = Color(0xFFFFFFFF);
 
-  static const Color backgroundLight = Color(0xFFF7F9F7);
+  static const Color backgroundLight = Color(0xFFFAFBF7); // Clean Nature Background
   static const Color surfaceLight = Color(0xFFFFFFFF);
-  static const Color surfaceContainerLight = Color(0xFFEFF3EF);
-  static const Color surfaceContainerHighLight = Color(0xFFE6ECE6);
-  static const Color onSurfaceLight = Color(0xFF181D1A);
-  static const Color onSurfaceVariantLight = Color(0xFF4A554E);
+  static const Color surfaceContainerLight = Color(0xFFF3F6F1);
+  static const Color surfaceContainerHighLight = Color(0xFFE8EDE8);
+  static const Color onSurfaceLight = Color(0xFF17352B); // Deep Pine Charcoal
+  static const Color onSurfaceVariantLight = Color(0xFF72827C);
 
-  static const Color outlineLight = Color(0xFFD3DCD4);
-  static const Color outlineVariantLight = Color(0xFFE6ECE7);
+  static const Color outlineLight = Color(0xFFDFE6DA);
+  static const Color outlineVariantLight = Color(0xFFE2E8E3);
 
-  // Color Palette - Dark Mode
-  static const Color primaryDark = Color(0xFF88C9AE);
-  static const Color onPrimaryDark = Color(0xFF00382B);
-  static const Color primaryContainerDark = Color(0xFF153B2F);
-  static const Color onPrimaryContainerDark = Color(0xFFB5E4D1);
+  // Dark Mode Palette
+  static const Color primaryDark = Color(0xFF7CD9B5);
+  static const Color onPrimaryDark = Color(0xFF003825);
+  static const Color primaryContainerDark = Color(0xFF104B36);
+  static const Color onPrimaryContainerDark = Color(0xFFC7F2DF);
 
-  static const Color secondaryDark = Color(0xFFB8CCB8);
-  static const Color onSecondaryDark = Color(0xFF243427);
-  static const Color secondaryContainerDark = Color(0xFF3B4D3E);
-  static const Color onSecondaryContainerDark = Color(0xFFD4E3D4);
+  static const Color secondaryDark = Color(0xFFB5E2C4);
+  static const Color onSecondaryDark = Color(0xFF1B4E32);
+  static const Color secondaryContainerDark = Color(0xFF265A3D);
 
-  static const Color backgroundDark = Color(0xFF111513);
-  static const Color surfaceDark = Color(0xFF171C19);
-  static const Color surfaceContainerDark = Color(0xFF1E2420);
-  static const Color surfaceContainerHighDark = Color(0xFF262D28);
-  static const Color onSurfaceDark = Color(0xFFE2E5E2);
+  static const Color backgroundDark = Color(0xFF111714);
+  static const Color surfaceDark = Color(0xFF17201B);
+  static const Color surfaceContainerDark = Color(0xFF1E2A23);
+  static const Color surfaceContainerHighDark = Color(0xFF26352C);
+  static const Color onSurfaceDark = Color(0xFFE2E8E4);
   static const Color onSurfaceVariantDark = Color(0xFFA1ADA5);
 
-  static const Color outlineDark = Color(0xFF333D36);
-  static const Color outlineVariantDark = Color(0xFF252D27);
+  static const Color outlineDark = Color(0xFF334239);
+  static const Color outlineVariantDark = Color(0xFF25312A);
 
-  // Light Theme Definition
   static ThemeData get lightTheme {
     const colorScheme = ColorScheme(
       brightness: Brightness.light,
@@ -91,7 +89,7 @@ class AppTheme {
         titleTextStyle: TextStyle(
           color: onSurfaceLight,
           fontSize: 18,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           letterSpacing: -0.3,
         ),
       ),
@@ -99,7 +97,7 @@ class AppTheme {
         color: surfaceLight,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           side: BorderSide(color: outlineVariantLight, width: 1),
         ),
         margin: EdgeInsets.zero,
@@ -126,7 +124,7 @@ class AppTheme {
           if (states.contains(WidgetState.selected)) {
             return const TextStyle(
               fontSize: 12,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
               color: primaryLight,
             );
           }
@@ -143,8 +141,8 @@ class AppTheme {
         elevation: 1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
-            topRight: Radius.circular(14),
-            bottomRight: Radius.circular(14),
+            topRight: Radius.circular(16),
+            bottomRight: Radius.circular(16),
           ),
         ),
       ),
@@ -155,11 +153,11 @@ class AppTheme {
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
           ),
           textStyle: const TextStyle(
             fontSize: 14,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
             letterSpacing: 0.1,
           ),
         ),
@@ -170,7 +168,7 @@ class AppTheme {
           side: const BorderSide(color: outlineLight, width: 1),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
           ),
           textStyle: const TextStyle(
             fontSize: 14,
@@ -180,29 +178,28 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: surfaceContainerLight,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        fillColor: surfaceLight,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: outlineVariantLight),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: outlineVariantLight),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: primaryLight, width: 1.5),
         ),
         hintStyle: const TextStyle(
           color: onSurfaceVariantLight,
-          fontSize: 14,
+          fontSize: 13,
         ),
       ),
     );
   }
 
-  // Dark Theme Definition
   static ThemeData get darkTheme {
     const colorScheme = ColorScheme(
       brightness: Brightness.dark,
@@ -232,72 +229,28 @@ class AppTheme {
         backgroundColor: backgroundDark,
         foregroundColor: onSurfaceDark,
         elevation: 0,
-        scrolledUnderElevation: 0.5,
         surfaceTintColor: Colors.transparent,
         centerTitle: false,
-        systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.light,
-        ),
         titleTextStyle: TextStyle(
           color: onSurfaceDark,
           fontSize: 18,
-          fontWeight: FontWeight.w600,
-          letterSpacing: -0.3,
+          fontWeight: FontWeight.w700,
         ),
       ),
       cardTheme: const CardThemeData(
         color: surfaceDark,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           side: BorderSide(color: outlineDark, width: 1),
         ),
         margin: EdgeInsets.zero,
       ),
-      dividerTheme: const DividerThemeData(
-        color: outlineDark,
-        thickness: 1,
-        space: 1,
-      ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: surfaceDark,
         elevation: 0,
-        height: 68,
         indicatorColor: primaryContainerDark,
         surfaceTintColor: Colors.transparent,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        iconTheme: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return const IconThemeData(color: primaryDark, size: 22);
-          }
-          return const IconThemeData(color: onSurfaceVariantDark, size: 22);
-        }),
-        labelTextStyle: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: primaryDark,
-            );
-          }
-          return const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: onSurfaceVariantDark,
-          );
-        }),
-      ),
-      drawerTheme: const DrawerThemeData(
-        backgroundColor: surfaceDark,
-        surfaceTintColor: Colors.transparent,
-        elevation: 1,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topRight: Radius.circular(14),
-            bottomRight: Radius.circular(14),
-          ),
-        ),
       ),
     );
   }

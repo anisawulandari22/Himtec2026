@@ -4,7 +4,7 @@ import 'detail_crop_screen.dart';
 import 'add_crop_bottom_sheet.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -13,7 +13,6 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _currentIndex = 0;
 
-  // Data Dummy Sesuai Desain Figma
   final List<CropModel> activeCrops = [
     CropModel(
       id: '1',
@@ -62,7 +61,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const AddCropBottomSheet(),
+      builder: (context) => AddCropBottomSheet(
+        onCropAdded: (newCrop) {
+          setState(() {
+            activeCrops.add(newCrop);
+          });
+        },
+      ),
     );
   }
 
@@ -110,7 +115,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               Text(
                                 "Halo, Petani Urban!",
                                 style: TextStyle(
-                                  fontFamily: 'Manrope',
                                   fontSize: 20,
                                   fontWeight: FontWeight.w800,
                                   color: Color(0xFF17352B),
@@ -177,7 +181,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 Text(
                                   "31°",
                                   style: TextStyle(
-                                    fontFamily: 'Manrope',
                                     fontSize: 36,
                                     fontWeight: FontWeight.w700,
                                     color: Colors.white,
@@ -218,7 +221,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   const SizedBox(height: 14),
 
-                  // Alert Card (Peringatan Cuaca Panas)
+                  // Alert Card
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
@@ -285,7 +288,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           Text(
                             "Tanaman Aktif",
                             style: TextStyle(
-                              fontFamily: 'Manrope',
                               fontSize: 21,
                               fontWeight: FontWeight.w800,
                               color: Color(0xFF17352B),
@@ -350,6 +352,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   width: 77,
                                   height: 81,
                                   fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => Container(
+                                    width: 77,
+                                    height: 81,
+                                    color: const Color(0xFFEAF3E7),
+                                    child: const Icon(Icons.eco, color: Color(0xFF196B4A)),
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 13),
@@ -363,7 +371,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         Text(
                                           crop.name,
                                           style: const TextStyle(
-                                            fontFamily: 'Manrope',
                                             fontSize: 16,
                                             fontWeight: FontWeight.w800,
                                             color: Color(0xFF17352B),
