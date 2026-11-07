@@ -33,8 +33,6 @@ class MainWrapper extends StatelessWidget {
   }
 
   List<Widget> _getActionsForIndex(BuildContext context, int index) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     switch (index) {
       case 0:
         return [

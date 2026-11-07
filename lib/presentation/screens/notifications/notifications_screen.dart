@@ -104,11 +104,11 @@ class NotificationsScreen extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: isUnread
-            ? colorScheme.primaryContainer.withOpacity(0.25)
+            ? colorScheme.primaryContainer.withValues(alpha: 0.25)
             : colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: isUnread ? colorScheme.primary.withOpacity(0.3) : colorScheme.outlineVariant,
+          color: isUnread ? colorScheme.primary.withValues(alpha: 0.3) : colorScheme.outlineVariant,
         ),
       ),
       child: Row(
@@ -169,7 +169,7 @@ class NotificationsScreen extends StatelessWidget {
                   time,
                   style: TextStyle(
                     fontSize: 11,
-                    color: colorScheme.onSurfaceVariant.withOpacity(0.8),
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
                   ),
                 ),
               ],

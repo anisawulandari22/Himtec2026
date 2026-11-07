@@ -128,7 +128,7 @@ class AppDrawer extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: colorScheme.surface,
                   borderRadius: BorderRadius.circular(6),
-                  border: Border.override(
+                  border: Border.all(
                     color: colorScheme.outlineVariant,
                     width: 1,
                   ),
@@ -179,7 +179,7 @@ class AppDrawer extends StatelessWidget {
         'HIMTEC Mobile v1.0.0',
         style: TextStyle(
           fontSize: 11,
-          color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -267,7 +267,7 @@ class _DrawerItem extends StatelessWidget {
     } else if (isSelected) {
       iconColor = colorScheme.primary;
       textColor = colorScheme.primary;
-      tileColor = colorScheme.primaryContainer.withOpacity(0.5);
+      tileColor = colorScheme.primaryContainer.withValues(alpha: 0.5);
     } else {
       iconColor = colorScheme.onSurfaceVariant;
       textColor = colorScheme.onSurface;
@@ -300,4 +300,3 @@ class _DrawerItem extends StatelessWidget {
     );
   }
 }
-

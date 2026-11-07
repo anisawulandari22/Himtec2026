@@ -38,46 +38,56 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildSettingsContainer(
             context,
             children: [
-              RadioListTile<ThemeMode>(
-                title: const Text('Ikuti Pengaturan Sistem', style: TextStyle(fontSize: 14)),
-                subtitle: const Text(
-                  'Menyesuaikan otomatis dengan preferensi perangkat Anda',
-                  style: TextStyle(fontSize: 12),
+              Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Pilih Mode Tampilan Aplikasi',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Sesuaikan nuansa antarmuka dengan kebutuhan pencahayaan Anda.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    SizedBox(
+                      width: double.infinity,
+                      child: SegmentedButton<ThemeMode>(
+                        segments: const [
+                          ButtonSegment<ThemeMode>(
+                            value: ThemeMode.system,
+                            icon: Icon(Icons.brightness_auto_outlined, size: 18),
+                            label: Text('Sistem'),
+                          ),
+                          ButtonSegment<ThemeMode>(
+                            value: ThemeMode.light,
+                            icon: Icon(Icons.light_mode_outlined, size: 18),
+                            label: Text('Terang'),
+                          ),
+                          ButtonSegment<ThemeMode>(
+                            value: ThemeMode.dark,
+                            icon: Icon(Icons.dark_mode_outlined, size: 18),
+                            label: Text('Gelap'),
+                          ),
+                        ],
+                        selected: {themeProvider.themeMode},
+                        onSelectionChanged: (newSelection) {
+                          themeProvider.setThemeMode(newSelection.first);
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-                value: ThemeMode.system,
-                groupValue: themeProvider.themeMode,
-                activeColor: colorScheme.primary,
-                onChanged: (val) {
-                  if (val != null) themeProvider.setThemeMode(val);
-                },
-              ),
-              const Divider(),
-              RadioListTile<ThemeMode>(
-                title: const Text('Mode Terang (Light Mode)', style: TextStyle(fontSize: 14)),
-                subtitle: const Text(
-                  'Latar cerah dengan aksen Deep Forest Green',
-                  style: TextStyle(fontSize: 12),
-                ),
-                value: ThemeMode.light,
-                groupValue: themeProvider.themeMode,
-                activeColor: colorScheme.primary,
-                onChanged: (val) {
-                  if (val != null) themeProvider.setThemeMode(val);
-                },
-              ),
-              const Divider(),
-              RadioListTile<ThemeMode>(
-                title: const Text('Mode Gelap (Dark Mode)', style: TextStyle(fontSize: 14)),
-                subtitle: const Text(
-                  'Latar gelap hemat daya dengan aksen Soft Emerald',
-                  style: TextStyle(fontSize: 12),
-                ),
-                value: ThemeMode.dark,
-                groupValue: themeProvider.themeMode,
-                activeColor: colorScheme.primary,
-                onChanged: (val) {
-                  if (val != null) themeProvider.setThemeMode(val);
-                },
               ),
             ],
           ),
@@ -95,7 +105,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   style: TextStyle(fontSize: 12),
                 ),
                 value: _pushNotifications,
-                activeColor: colorScheme.primary,
                 onChanged: (val) => setState(() => _pushNotifications = val),
               ),
               const Divider(),
@@ -106,7 +115,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   style: TextStyle(fontSize: 12),
                 ),
                 value: _emailDigest,
-                activeColor: colorScheme.primary,
                 onChanged: (val) => setState(() => _emailDigest = val),
               ),
             ],
@@ -125,7 +133,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   style: TextStyle(fontSize: 12),
                 ),
                 value: _biometricAuth,
-                activeColor: colorScheme.primary,
                 onChanged: (val) => setState(() => _biometricAuth = val),
               ),
               const Divider(),

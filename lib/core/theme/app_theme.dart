@@ -51,7 +51,7 @@ class AppTheme {
 
   // Light Theme Definition
   static ThemeData get lightTheme {
-    final colorScheme = ColorScheme(
+    const colorScheme = ColorScheme(
       brightness: Brightness.light,
       primary: primaryLight,
       onPrimary: onPrimaryLight,
@@ -68,8 +68,8 @@ class AppTheme {
       onSurfaceVariant: onSurfaceVariantLight,
       outline: outlineLight,
       outlineVariant: outlineVariantLight,
-      error: const Color(0xFFBA1A1A),
-      onError: const Color(0xFFFFFFFF),
+      error: Color(0xFFBA1A1A),
+      onError: Color(0xFFFFFFFF),
     );
 
     return ThemeData(
@@ -95,12 +95,12 @@ class AppTheme {
           letterSpacing: -0.3,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: const CardThemeData(
         color: surfaceLight,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: const BorderSide(color: outlineVariantLight, width: 1),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          side: BorderSide(color: outlineVariantLight, width: 1),
         ),
         margin: EdgeInsets.zero,
       ),
@@ -204,7 +204,7 @@ class AppTheme {
 
   // Dark Theme Definition
   static ThemeData get darkTheme {
-    final colorScheme = ColorScheme(
+    const colorScheme = ColorScheme(
       brightness: Brightness.dark,
       primary: primaryDark,
       onPrimary: onPrimaryDark,
@@ -219,8 +219,8 @@ class AppTheme {
       onSurfaceVariant: onSurfaceVariantDark,
       outline: outlineDark,
       outlineVariant: outlineVariantDark,
-      error: const Color(0xFFFFB4AB),
-      onError: const Color(0xFF690005),
+      error: Color(0xFFFFB4AB),
+      onError: Color(0xFF690005),
     );
 
     return ThemeData(
@@ -246,12 +246,12 @@ class AppTheme {
           letterSpacing: -0.3,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: const CardThemeData(
         color: surfaceDark,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: const BorderSide(color: outlineDark, width: 1),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          side: BorderSide(color: outlineDark, width: 1),
         ),
         margin: EdgeInsets.zero,
       ),
@@ -302,4 +302,3 @@ class AppTheme {
     );
   }
 }
-
