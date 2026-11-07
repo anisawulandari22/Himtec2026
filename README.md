@@ -80,13 +80,73 @@ Modul pemindai diagnosa penyakit (`GeminiService`) mengintegrasikan API kecerdas
 - **AGL Agro-Veterinary AI Vision Engine (Offline Edge Fallback)**:
   Untuk memastikan aplikasi selalu dapat mendiagnosa di area perkebunan/peternakan tanpa koneksi internet atau tanpa API key, sistem dilengkapi mesin visi komputasi agroveteriner lokal yang mengekstraksi spektrum warna, rasio eritema kemerahan lesi, nekrosis, dan tekstur untuk mendiagnosa patologi tanaman maupun hewan ternak secara presisi tanpa mode demo.
 
-### 2. Autentikasi Pengguna & Integrasi Akun Google
+### 2. Database Patologi Tanaman (Fitopatologi Pertanian)
+Katalog patologi tanaman komprehensif yang telah diprogramkan ke dalam kecerdasan buatan AGL:
+- **Antraknosa / Patek Buah & Daun (*Colletotrichum capsici*)**:
+  - *Komoditas*: Cabai Merah, Cabai Rawit, Tomat, Terung.
+  - *Gejala Visual*: Lesi nekrotik cekung melingkar kehitaman pada buah dan daun, cincin konsentris spora jamur, mati pucuk (*dieback*).
+  - *Solusi & Pencegahan*: Eradikasi buah sakit, kocor agens hayati *Trichoderma harzianum*, semprot fungisida nabati daun sirih merah (100 gr/liter air), jaga jarak tanam 50-60 cm, dan kurangi pupuk nitrogen tunggal di musim hujan.
+- **Hawar Daun Bakteri / Kresek (*Xanthomonas oryzae pv. oryzae*)**:
+  - *Komoditas*: Padi Sawah, Padi Gogo.
+  - *Gejala Visual*: Garis basah keabuan memanjang dari tepian daun ke pangkal, daun menggulung mengering pucat terbakar, butiran eksudat embun bakteri di pagi hari.
+  - *Solusi & Pencegahan*: Pengairan berselang (*intermittent*), semprot bakterisida rimpang kunyit dan lengkuas, aplikasi agens PGPR (*Pseudomonas fluorescens*), batasi urea, dan gunakan varietas tahan (Inpari 32 HDB / Inpari 42).
+- **Virus Mosaik Kuning / Gemini Bule (*Pepper Yellow Leaf Curl Virus - PepYLCV*)**:
+  - *Komoditas*: Cabai, Tomat, Terung, Tembakau.
+  - *Gejala Visual*: Daun muda mengecil kaku melengkung ke atas (*cupping*), tulang daun menebal dengan belang klorosis kuning terang kontras, tanaman kerdil.
+  - *Solusi & Pencegahan*: Kendalikan vektor kutu kebul (*Bemisia tabaci*) dengan minyak nimba (*neem oil*), semprot agens jamur entomopatogen *Beauveria bassiana*, pasang 40 perangkap lekat kuning per hektar, dan tanam barisan jagung/serai wangi sebagai *barrier*.
+- **Embun Buluk / Busuk Daun (*Phytophthora infestans*)**:
+  - *Komoditas*: Tomat, Kentang, Paprika.
+  - *Gejala Visual*: Bercak basah hijau gelap kehitaman tidak beraturan di ujung daun, lapisan jamur keputihan halus di balik daun, batang melunak cokelat basah.
+  - *Solusi & Pencegahan*: Pemangkasan sanitasi tajuk bawah (*wiwil*), aplikasi bio-fungisida *Trichoderma viride*, semprot bubur bordeaux tembaga organik, gunakan naungan *rain shelter* saat curah hujan ekstrem.
+- **Bercak Ungu / Trotol Daun (*Alternaria porri*)**:
+  - *Komoditas*: Bawang Merah, Bawang Putih, Bawang Daun.
+  - *Gejala Visual*: Titik melekuk putih keabuan dengan pusat ungu, meluas membentuk cincin konsentris yang mematahkan ujung daun, umbi busuk berair.
+  - *Solusi & Pencegahan*: Semprot fungisida ekstrak rimpang lengkuas dan mimba, kocor agens hayati *Gliocladium sp.*, perbaiki parit bedengan bebas genangan air, gunakan benih umbi bersertifikat bebas patogen.
+- **Penyakit Bulai Daun (*Peronosclerospora maydis*)**:
+  - *Komoditas*: Jagung Hibrida, Jagung Manis.
+  - *Gejala Visual*: Garis klorotik putih kekuningan sejajar tulang daun dari pangkal ke ujung, lapisan tepung spora putih di balik daun, tanaman kerdil tanpa tongkol (*mandul*).
+  - *Solusi & Pencegahan*: Eradikasi tanaman terinfeksi segera, perlakuan benih (*seed treatment*) fungisida sistemik, semprot agens hayati *Pseudomonas fluorescens*, tanam serempak dalam radius 500 meter.
+- **Tanaman Sehat & Segar (Kondisi Prima)**:
+  - *Ciri Visual*: Distribusi klorofil hijau merata dan cerah, kutikula dan stomata utuh tanpa luka patogen/hama, turgor daun optimal berfotosintesis aktif.
+  - *Perawatan*: Jadwal siram konsisten, aplikasi Pupuk Organik Cair (POC) urin kelinci/azolla berkala, proteksi preventif Trichoderma tiap 2 minggu.
+
+### 3. Database Patologi Hewan Ternak (Veteriner Peternakan)
+Katalog patologi hewan ternak komprehensif yang telah diprogramkan ke dalam kecerdasan buatan AGL:
+- **Penyakit Mulut dan Kuku / PMK (*Aphthae Epizooticae - Picornaviridae*)**:
+  - *Spesies Rentan*: Sapi Potong, Sapi Perah, Kerbau, Kambing, Domba.
+  - *Gejala Klinis*: Lesi vesikular (melepuh) pada mukosa lidah, bibir, gusi, puting susu, dan celah antar kuku; hipersalivasi hebat (air liur berbusa menggantung); demam tinggi; kepincangan parah enggan berdiri.
+  - *Protokol Darurat & Biosekuriti*: Karantina ternak minimal 100 meter dari kawanan, bersihkan luka lepuh dengan asam sitrat 2% atau povidone iodine, sajikan hijauan lunak cincang dan multivitamin, wajibkan vaksinasi PMK berkala, dan celup alas kaki/ban di bak disinfektan.
+- **Scabies / Kudis Sarcoptic (*Sarcoptes scabiei var. caprae/bovis*)**:
+  - *Spesies Rentan*: Kambing, Domba, Sapi, Kelinci.
+  - *Gejala Klinis*: Kerak keropeng tebal bersisik keabu-abuan pada moncong, telinga, leher, dan mata; kerontokan bulu meluas (*alopesia*); rasa gatal intens hingga ternak menggesekkan tubuh ke tiang kandang.
+  - *Protokol Darurat & Biosekuriti*: Mandikan dengan air hangat belerang (sulfur 2%), oleskan salep minyak kelapa + tumbukan sirih + belerang, suntik antiparasit ivermectin subkutan sesuai dosis medik veteriner, semprot disinfektan lantai kandang panggung, dan jemur ternak pagi hari.
+- **Mastitis Klinis / Radang Kelenjar Ambing (*Streptococcus agalactiae / Staphylococcus aureus*)**:
+  - *Spesies Rentan*: Sapi Perah, Kambing Perah.
+  - *Gejala Klinis*: Kuartir ambing membengkak keras teraba panas kemerahan, sapi menendang kesakitan, air susu pecah menggumpal menyerupai endapan nanah/darah.
+  - *Protokol Darurat & Biosekuriti*: Perah tuntas seluruh susu rusak ke saluran tertutup, kompres hangat ambing, celup puting (*teat dip*) antiseptik klorheksidin/iodin 0.5%, terapi intramamari dokter hewan, cuci tangan pemerah, kain lap terpisah per ekor, dan uji CMT mingguan.
+- **Kembung Rumen Akut / Bloat (*Timpani Rumen*)**:
+  - *Spesies Rentan*: Sapi Potong, Sapi Perah, Kambing, Domba.
+  - *Gejala Klinis*: Distensi perut kiri (*fossa paralumbalis*) membesar tegang seperti drum, ternak gelisah meregangkan leher, nafas cepat terengah-engah dengan mulut terbuka.
+  - *Protokol Darurat & Pakan*: Posisikan kaki depan lebih tinggi, cekoki minyak nabati hangat (minyak kelapa/sawit 200-300 ml) atau obat *dimethicone* pemecah buih gas, pasang kayu pengganjal mulut (*gag*) untuk memicu sendawa (*eruktasi*), hindari legum basah berembun, dan layukan rumput segar sebelum diberikan.
+- **Tetelo / Sampar Ayam (*Newcastle Disease - Avian Paramyxovirus*)**:
+  - *Spesies Rentan*: Ayam Broiler, Ayam Petelur/Layer, Ayam Kampung, Unggas Air.
+  - *Gejala Klinis*: Gangguan saraf leher terpuntir (*tortikolis*), gemetar, sayap terkulai lemas, ngorok batuk (*râles*), kotoran encer hijau keputihan berlendir, jengger kebiruan (*sianosis*).
+  - *Protokol Darurat & Biosekuriti*: Isolasi unggas sakit ke ruang tertutup terpisah, berikan multivitamin anti-stres dosis tinggi dan larutan gula aren dalam air minum, semprot antiseptik udara, wajibkan vaksinasi ND berkala (tetes mata & suntik), dan terapkan sistem *all-in all-out*.
+- **Koksidiosis / Berak Darah Unggas (*Eimeria tenella / Eimeria necatrix*)**:
+  - *Spesies Rentan*: Ayam Broiler, Ayam Layer fase brooding.
+  - *Gejala Klinis*: Feses kotoran bercampur darah merah segar/cokelat kental di sekitar sekam kandang, ayam bergerombol mengantuk dengan mata terpejam dan bulu kusut, jengger pucat, nafsu makan anjlok.
+  - *Protokol Darurat & Biosekuriti*: Berikan antikoksidia (*toltrazuril* / sulfonamida) via air minum, ganti litter sekam basah dengan sekam kering baru, tambahkan vitamin K untuk menghentikan pendarahan sekum, jaga kelembapan alas kandang (<25%), dan perbaiki nepel minum bocor.
+- **Hewan Ternak Sehat & Bugar (Kondisi Prima)**:
+  - *Ciri Klinis*: Mata bersinar jernih responsif, cermin hidung lembap basah normal, bulu mengkilap halus tanpa keropeng, memamah biak aktif, kotoran feses berkonsistensi normal.
+  - *Pemeliharaan*: Ransum hijauan dan konsentrat seimbang, air minum bersih selalu tersedia (*ad-libitum*), mineral blok jilat, sanitasi kotoran tiap pagi, dan vaksinasi booster tepat waktu.
+
+### 4. Autentikasi Pengguna & Integrasi Akun Google
 Layanan otentikasi (`AuthProvider`) menyediakan dua jalur masuk:
 - **Email & Kata Sandi**: Validasi format email, verifikasi panjang kata sandi, registrasi profil lengkap dengan pilihan fokus sektor (Pertanian, Peternakan, atau Keduanya), dan identifikasi keanggotaan unik.
 - **Akun Google**: Mekanisme masuk cepat akun Google dengan dialog pemilihan akun interaktif, sinkronisasi identitas resmi, avatar profil, dan penyimpanan token sesi.
 - **Session Persistence**: Seluruh status autentikasi disimpan di `StorageService` melalui `SharedPreferences` sehingga pengguna tetap dalam status masuk saat membuka kembali aplikasi.
 
-### 3. Bursa Komoditas & Kalkulator Laba Multi-Kota
+### 5. Bursa Komoditas & Kalkulator Laba Multi-Kota
 Layanan kalkulasi pasar (`MarketCityModel` & `MarketScreen`) mengintegrasikan data harga komoditas acuan di 11 kota strategis Indonesia (Jakarta, Bandung, Surabaya, Medan, Makassar, Denpasar, Yogyakarta, Semarang, Palembang, Banjarmasin, Jayapura):
 - **Simulasi Hasil Panen**: Menghitung estimasi total tonase panen, omzet kotor, biaya operasional, dan laba bersih berdasarkan jumlah lubang tanam dan persentase tingkat keberhasilan.
 - **Kalkulator Timbang Hidup vs Sembelih Daging Karkas**:
@@ -189,10 +249,12 @@ Himtec2026/
 - Rekomendasi suplemen vitamin dan mineral penting untuk mengoptimalkan kekebalan dan bobot harian.
 - Jurnal Catat Perkembangan Ternak: pencatatan penambahan bobot badan (timbang rutin) dan catatan kesehatan lengkap dengan dokumentasi foto.
 
-### 3. Pemindai Diagnosa Hama & Penyakit AI (Vision AI)
-- Pemindaian langsung menggunakan kamera dengan kontrol senter penerangan untuk area daun atau bagian tubuh hewan.
-- Diagnosa instan nama penyakit, taksonomi latin, tingkat keparahan, dan persentase keyakinan.
-- Rekomendasi tindakan kuratif herbal/organik dan langkah preventif jangka panjang.
+### 3. Pemindai Diagnosa Hama & Penyakit AI Terpadu (Dual-Sector Vision AI)
+- **Selektor Sektor Dua Ranah**: Pengalih instan pada viewfinder kamera antara mode Tanaman (*Pertanian*) dan mode Hewan Ternak (*Peternakan*).
+- **Diagnosa Presisi Berbasis Database Patologi**:
+  - *Pertanian*: Mendiagnosa Antraknosa (Patek), Hawar Daun Bakteri (Kresek), Virus Mosaik Kuning (Gemini Bule), Embun Buluk (Phytophthora), Bercak Ungu (Trotol), dan Bulai Jagung.
+  - *Peternakan*: Mendiagnosa Penyakit Mulut dan Kuku (PMK), Scabies (Kudis Sarcoptic), Mastitis Klinis Ambing, Bloat Kembung Rumen, Tetelo (Newcastle Disease), dan Koksidiosis Berak Darah.
+- **Keluaran Terstandarisasi**: Tingkat keparahan klinis (Normal s/d Kritis), persentase keyakinan (88% - 98%), nama taksonomi latin patogen, protokol medis veteriner darurat / solusi agens hayati nabati, dan langkah biosekuriti kandang.
 
 ### 4. Bursa Pasar 11 Kota & Pemisahan Kalkulator Sektor
 - **Pemisahan Sektor Bersih**: Memisahkan antarmuka, acuan harga, dan kalkulator antara Hasil Panen (Pertanian) dan Hasil Ternak (Peternakan) agar kalkulasi mandiri dan tidak saling bentrok.
