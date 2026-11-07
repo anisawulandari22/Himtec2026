@@ -100,3 +100,4 @@ class GrowthRecordProvider extends ChangeNotifier {
     StorageService.saveGrowthRecords(_records);
   }
 }
+

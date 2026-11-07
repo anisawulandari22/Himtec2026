@@ -47,3 +47,4 @@ class GrowthRecordModel {
     extraMetric: json['extraMetric'] as String?,
   );
 }
+
