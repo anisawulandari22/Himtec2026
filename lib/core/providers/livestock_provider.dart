@@ -207,6 +207,7 @@ class LivestockProvider extends ChangeNotifier {
   }
 
   List<LivestockModel> get livestockList => List.unmodifiable(_livestock);
+  List<LivestockModel> get livestock => List.unmodifiable(_livestock);
 
   int get totalLivestock => _livestock.length;
 

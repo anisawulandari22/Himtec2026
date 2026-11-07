@@ -212,8 +212,8 @@ class _GrowthRecordsScreenState extends State<GrowthRecordsScreen> {
                               if (val) {
                                 setModalState(() {
                                   selectedType = 'Ternak';
-                                  if (livestockProvider.livestock.isNotEmpty) {
-                                    final first = livestockProvider.livestock.first;
+                                  if (livestockProvider.livestockList.isNotEmpty) {
+                                    final first = livestockProvider.livestockList.first;
                                     selectedEntityId = first.id;
                                     selectedEntityName = first.name;
                                     selectedCategory = first.category;
@@ -244,7 +244,7 @@ class _GrowthRecordsScreenState extends State<GrowthRecordsScreen> {
                     // Pilih Entitas Spesifik
                     if (selectedType == 'Tanaman') ...[
                       DropdownButtonFormField<String>(
-                        value: selectedEntityId,
+                        initialValue: selectedEntityId,
                         decoration: InputDecoration(
                           labelText: 'Pilih Tanaman',
                           filled: true,
@@ -273,14 +273,14 @@ class _GrowthRecordsScreenState extends State<GrowthRecordsScreen> {
                       ),
                     ] else ...[
                       DropdownButtonFormField<String>(
-                        value: selectedEntityId,
+                        initialValue: selectedEntityId,
                         decoration: InputDecoration(
                           labelText: 'Pilih Hewan Ternak',
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                         ),
-                        items: livestockProvider.livestock.map((l) {
+                        items: livestockProvider.livestockList.map((l) {
                           return DropdownMenuItem(
                             value: l.id,
                             child: Text('${l.name} (${l.tagNumber})'),
