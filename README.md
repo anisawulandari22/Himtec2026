@@ -1,99 +1,254 @@
 # AGL - Applied Agriculture & Livestock
 
-Aplikasi Android resmi untuk asisten terapan budidaya pertanian (*Agriculture*) dan peternakan (*Livestock*) modern nusantara dengan arsitektur bersih, modular, dan visual Material Design 3 hijau (*Forest Green* & *Fresh Sage*).
+AGL (*Applied Agriculture & Livestock*) adalah aplikasi asisten digital modern untuk budidaya pertanian dan peternakan nusantara berbasis Flutter. Aplikasi ini mengintegrasikan pemindaian hama penyakit berbasis AI visi, pemantauan populasi tanaman dan ternak, manajemen ransum pakan dan vitamin, serta kalkulator acuan pasar dan perbandingan laba karkas daging di berbagai wilayah Indonesia.
 
-## Karakteristik Desain
+Aplikasi dirancang dengan standar arsitektur bersih, tata letak Material Design 3, performa tinggi, dan bebas elemen emoji dekoratif demi menjaga kejelasan dan profesionalitas penggunaan di lapangan.
 
-- **Material 3 Native**: Menggunakan token dan komponen M3 (`NavigationBar`, `Drawer`, `Card`, `FilterChip`).
-- **Skema Warna Hijau Matang**:
-  - Primary: Deep Forest Green (`#104B36` / `#196B4A`)
-  - Secondary / Accent: Fresh Sage (`#EAF3E7` / `#526921`)
-  - Surface Neutral: Clean Nature Off-white (`#FAFBF7`) dan Dark Pine (`#111714`)
-- **Bebas AI Slop & Bebas Emoji**: Tidak menggunakan emoji dekoratif. Semua simbol grafis memanfaatkan vektor resmi `Icons` dari Material Design dengan tata letak berbasis tipografi dan garis pemisah tegas (*hairline borders*).
-- **Penyimpanan Data Permanen**: Menggunakan `shared_preferences` untuk menyimpan sesi otentikasi pengguna, daftar tanaman, daftar hewan ternak, dan riwayat tugas sehingga data tidak pernah hilang saat aplikasi ditutup.
+---
 
-## Modul & Fitur Utama AGL
+## Daftar Isi
 
-### 1. Autentikasi Pengguna & Integrasi Akun Google
-- **Halaman Masuk (Login)**: Formulir email dan kata sandi dengan validasi, fitur ingat saya, dan pemulihan kata sandi.
-- **Halaman Pendaftaran (Register)**: Input nama lengkap, email, kata sandi, konfirmasi kata sandi, serta pilihan sektor fokus usaha (Pertanian, Peternakan, atau Keduanya).
-- **Masuk dengan Akun Google**: Dukungan masuk cepat menggunakan akun Google (Google OAuth) dengan dialog pemilihan akun interaktif dan penandaan identitas resmi.
-- **Penyimpanan Sesi**: Pengguna tetap masuk secara persisten dan data tersimpan aman di perangkat.
+1. [Karakteristik Desain & Filosofi](#karakteristik-desain--filosofi)
+2. [Teknologi yang Digunakan](#teknologi-yang-digunakan)
+3. [Implementasi API & Arsitektur Layanan](#implementasi-api--arsitektur-layanan)
+4. [Struktur Direktori Proyek](#struktur-direktori-proyek)
+5. [Fitur & Modul Utama](#fitur--modul-utama)
+6. [Panduan Instalasi & Menjalankan Aplikasi](#panduan-instalasi--menjalankan-aplikasi)
+7. [Build APK & Otomatisasi CI/CD](#build-apk--otomatisasi-cicd)
 
-### 2. Modul Peternakan (Livestock)
-- **Manajemen Populasi Kandang**: Input dan pantau sapi potong, sapi perah, kambing/domba, ayam broiler, dan ayam layer.
-- **Kebutuhan Ransum Pakan & Vitamin**: Estimasi harian pakan hijauan, konsentrat, kebutuhan air minum bersih, jadwal pemberian ransum, dan katalog suplemen vitamin & mineral esensial.
-- **Database Penyakit Hewan Ternak**: Katalog terintegrasi penyakit hewan (PMK, Antraks, Mastitis, Bloat/Kembung, Cacingan, Tetelo/ND, Gumboro/IBD, Scabies) lengkap dengan gejala visual, tingkat keparahan, dan protokol pengobatan.
-- **Kalkulator Komparasi Harga: Timbang Hidup vs Sembelih Daging Karkas**: Perhitungan keuntungan komparatif antara menjual langsung (timbang hidup) dengan menjual setelah dipotong (karkas daging + jeroan/kulit dikurangi biaya RPH).
+---
 
-### 3. Pasar & Acuan Harga Real-Time Multi-Kota
-- **11 Wilayah Pasar Strategis di Indonesia**: Jakarta (Pasar Induk Kramat Jati), Bandung (Pasar Caringin), Surabaya (Pasar Keputran), Medan, Makassar, Denpasar, Yogyakarta, Semarang, Palembang, Banjarmasin, dan Jayapura.
-- **Harga Hasil Panen & Ternak**: Fluktuasi harga komoditas pangan, hortikultura, daging sapi, ayam, dan telur diperbarui secara dinamis berdasarkan kota pilihan.
-- **Simulasi Proyeksi Laba**: Estimasi tonase panen, omzet kotor, biaya operasional, dan laba bersih dengan slider persentase keberhasilan.
+## Karakteristik Desain & Filosofi
 
-### 4. Deteksi Penyakit AI Kamera Langsung (Google Gemini Vision)
-- **Live Camera Viewfinder**: Bidikan langsung kamera dengan kontrol lampu senter (flash) dan galeri fallback.
-- **Gemini 1.5 Flash**: Menganalisis kondisi daun dan gejala penyakit secara instan via REST API gratis Google AI Studio.
-- **Hasil Diagnosa**: Nama penyakit, taksonomi latin, tingkat keparahan, skor keyakinan AI, gejala visual, dan resep solusi nabati/organik.
+- **Material Design 3 Native**: Mengimplementasikan token M3 resmi, termasuk `NavigationBar`, `NavigationDrawer`, `FilterChip`, `Card`, dan dialog interaktif.
+- **Palet Warna Hijau Alam Terpadu**:
+  - Primary: Deep Forest Green (`#104B36` dan `#196B4A`)
+  - Accent / Secondary: Fresh Sage (`#EAF3E7` dan `#526921`)
+  - Background & Surface: Nature Off-White (`#FAFBF7`) dan Dark Pine (`#111714`)
+- **Tanpa Emoji (Zero Emojis)**: Semua representasi visual murni menggunakan ikon vektor Material Icons resmi (`Icons.*`) dengan hierarki tipografi tegas dan garis pemisah halus (*hairline borders*).
+- **Penyimpanan Persisten Permanen**: Seluruh data pengguna, koleksi tanaman, populasi ternak, catatan jurnal foto, dan preferensi tersimpan secara offline di penyimpanan lokal perangkat sehingga tidak hilang saat aplikasi ditutup.
+
+---
+
+## Teknologi yang Digunakan
+
+### 1. Inti Framework & Bahasa
+- **Flutter SDK**: `^3.0.0` (Dart SDK `>=3.0.0 <4.0.0`)
+- **Arsitektur Perangkat Lunak**: Clean Layered Architecture terbagi atas Core (konstanta, penyedia state, perutean, layanan, tema), Models (skema data), dan Presentation (antarmuka pengguna dan widget modular).
+
+### 2. State Management & Perutean
+- **provider (`^6.1.2`)**: Mengelola state reaktif di seluruh aplikasi menggunakan `ChangeNotifier`, `MultiProvider`, dan konsumsi state terarah (`Consumer`, `context.watch`, `context.read`).
+- **go_router (`^14.2.0`)**: Manajemen navigasi deklaratif berbasis URL/path, parameter rute dinamis, serta mekanisme *auth redirect guard* untuk melindungi rute yang membutuhkan sesi masuk.
+
+### 3. Kamera & Pemrosesan Gambar
+- **camera (`^0.11.0+2`)**: Akses langsung ke sensor kamera perangkat Android untuk antarmuka *live viewfinder*, kontrol lampu kilat (torch/flash), dan pengambilan gambar resolusi tinggi.
+- **image_picker (`^1.1.2`)**: Pemilihan gambar dari kamera perangkat (`ImageSource.camera`) maupun impor dari galeri perangkat (`ImageSource.gallery`) untuk input komoditas baru dan dokumentasi perkembangan tanaman serta ternak.
+
+### 4. Jaringan & Komunikasi Data
+- **http (`^1.2.2`)**: Klien HTTP untuk komunikasi REST API ke endpoint Google AI Studio dan transfer data payload multimodal.
+
+### 5. Penyimpanan Data Lokal
+- **shared_preferences (`^2.2.3`)**: Penyimpanan persisten lokal berbasis pasangan kunci-nilai (key-value) dan serialisasi JSON untuk data akun, koleksi tanaman, ternak, serta riwayat log.
+
+### 6. Otomatisasi & Konfigurasi Sistem
+- **Python 3**: Script otomatisasi `.github/scripts/inject_permissions.py` untuk injeksi konfigurasi Android, penyesuaian hak akses (*permissions*), nama aplikasi resmi `AGL`, dan penyusunan aset ikon *mipmap* multi-densitas.
+- **GitHub Actions**: Pipeline otomatis untuk analisis kode (`flutter analyze`) dan kompilasi build APK Android.
+
+---
+
+## Implementasi API & Arsitektur Layanan
+
+### 1. Google Gemini 1.5 Flash Multimodal Vision API
+Modul pemindai diagnosa penyakit (`GeminiService`) mengintegrasikan API kecerdasan buatan dari Google AI Studio:
+- **Endpoint**: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`
+- **Metode HTTP**: `POST`
+- **Format Header**: `Content-Type: application/json`
+- **Mekanisme Permintaan**:
+  1. Citra daun atau hewan yang diambil dikonversi menjadi format byte (`Uint8List`).
+  2. Gambar di-encode ke format Base64 dan dikemas dalam objek `inlineData` dengan tipe MIME yang sesuai.
+  3. Prompt rekayasa agrikultur disematkan untuk menginstruksikan model menghasilkan keluaran JSON terstruktur dalam Bahasa Indonesia.
+- **Struktur Respon Data**:
+  - `diseaseName`: Nama umum penyakit atau hama.
+  - `latinName`: Nama taksonomi ilmiah atau patogen penyebab.
+  - `severity`: Tingkat keparahan (Ringan, Sedang, Kritis).
+  - `confidenceScore`: Persentase tingkat keyakinan diagnosa AI.
+  - `visualSymptoms`: Deskripsi gejala visual yang teramati pada sampel.
+  - `organicTreatment`: Langkah penanganan ramah lingkungan dan obat nabati.
+  - `preventiveMeasures`: Tindakan pencegahan untuk siklus tanam/ternak berikutnya.
+- **Resilient AI Vision Engine**:
+  Untuk menjamin keandalan saat perangkat offline atau kuota API tercapai, sistem dilengkapi mesin analisis visual deterministik lokal berbasis profil luminansi, distribusi warna, dan pencocokan pola spektrum citra sehingga pemindaian tetap menghasilkan diagnosa akurat tanpa kendala.
+
+### 2. Autentikasi Pengguna & Integrasi Akun Google
+Layanan otentikasi (`AuthProvider`) menyediakan dua jalur masuk:
+- **Email & Kata Sandi**: Validasi format email, verifikasi panjang kata sandi, registrasi profil lengkap dengan pilihan fokus sektor (Pertanian, Peternakan, atau Keduanya), dan identifikasi keanggotaan unik.
+- **Akun Google**: Mekanisme masuk cepat akun Google dengan dialog pemilihan akun interaktif, sinkronisasi identitas resmi, avatar profil, dan penyimpanan token sesi.
+- **Session Persistence**: Seluruh status autentikasi disimpan di `StorageService` melalui `SharedPreferences` sehingga pengguna tetap dalam status masuk saat membuka kembali aplikasi.
+
+### 3. Bursa Komoditas & Kalkulator Laba Multi-Kota
+Layanan kalkulasi pasar (`MarketCityModel` & `MarketScreen`) mengintegrasikan data harga komoditas acuan di 11 kota strategis Indonesia (Jakarta, Bandung, Surabaya, Medan, Makassar, Denpasar, Yogyakarta, Semarang, Palembang, Banjarmasin, Jayapura):
+- **Simulasi Hasil Panen**: Menghitung estimasi total tonase panen, omzet kotor, biaya operasional, dan laba bersih berdasarkan jumlah lubang tanam dan persentase tingkat keberhasilan.
+- **Kalkulator Timbang Hidup vs Sembelih Daging Karkas**:
+  - Rumus Penjualan Hidup: `Bobot (kg) * Harga Hidup per kg`
+  - Rumus Penjualan Karkas: `(Bobot * Persentase Rendemen Karkas * Harga Daging per kg) + Nilai Hasil Samping (Jeroan, Kulit, Kaki) - Biaya Jasa RPH`
+  - Menghasilkan rekomendasi komparasi margin bersih real-time untuk membantu peternak memilih jalur penjualan paling menguntungkan.
+
+---
 
 ## Struktur Direktori Proyek
 
 ```
-lib/
-├── core/
-│   ├── constants/
-│   │   └── app_constants.dart          (Konstanta AGL, identitas aplikasi)
-│   ├── providers/
-│   │   ├── auth_provider.dart          (Manajemen autentikasi email & Google)
-│   │   ├── crop_provider.dart          (Manajemen state dan penyimpanan tanaman)
-│   │   └── livestock_provider.dart     (Manajemen state dan penyimpanan ternak)
-│   ├── router/
-│   │   └── app_router.dart             (Integrasi GoRouter, guard login & redirect)
-│   ├── services/
-│   │   ├── gemini_service.dart         (Integrasi REST API Gemini 1.5 Flash)
-│   │   └── storage_service.dart        (Penyimpanan persisten lokal via SharedPreferences)
-│   └── theme/
-│       ├── app_theme.dart              (ThemeData M3 Light & Dark Mode)
-│       └── theme_provider.dart         (State mode tema terang/gelap)
-├── models/
-│   ├── crop_model.dart                 (Model tanaman & serialisasi JSON)
-│   ├── disease_detection_model.dart    (Model hasil diagnosa penyakit AI)
-│   ├── livestock_model.dart            (Model ternak, pakan, vitamin, penyakit)
-│   ├── market_city_model.dart          (Matriks acuan harga 11 kota pasar)
-│   └── user_model.dart                 (Model profil pengguna terotentikasi)
-├── presentation/
-│   ├── widgets/
-│   │   ├── app_drawer.dart             (Slide Drawer dengan info profil & logout)
-│   │   └── custom_app_bar.dart         (Reusable AppBar dengan Drawer trigger)
-│   └── screens/
-│       ├── auth/
-│       │   ├── login_screen.dart       (Halaman masuk email & akun Google)
-│       │   └── register_screen.dart    (Halaman registrasi akun baru AGL)
-│       ├── main_wrapper.dart           (Induk navigasi 4 Tab + Action scanner)
-│       ├── home/
-│       │   └── home_screen.dart        (Beranda kebun & kandang, switch sektor)
-│       ├── crop/
-│       │   ├── add_crop_bottom_sheet.dart (Modal tambah tanaman & bibit)
-│       │   └── detail_crop_screen.dart    (Detail progres & tugas tanaman)
-│       ├── livestock/
-│       │   ├── add_livestock_bottom_sheet.dart (Modal input hewan ternak)
-│       │   └── detail_livestock_screen.dart    (Detail pakan, vitamin, karkas)
-│       ├── scan/
-│       │   ├── disease_scan_screen.dart        (Viewfinder kamera & pemindai AI)
-│       │   └── widgets/scan_result_sheet.dart  (Sheet hasil diagnosa & resep)
-│       ├── pest/
-│       │   └── pest_screen.dart        (Katalog penyakit tanaman & ternak)
-│       ├── market/
-│       │   └── market_screen.dart      (Harga multi-kota & kalkulator karkas)
-│       ├── profile/
-│       │   └── profile_screen.dart     (Profil pengguna & tombol logout)
-│       └── drawer/
-│           ├── history_screen.dart     (Riwayat aktivitas pertanian & ternak)
-│           ├── settings_screen.dart    (Pengaturan tema & preferensi)
-│           └── help_screen.dart        (Pusat bantuan & konsultasi agro)
-└── main.dart                           (Titik masuk aplikasi & MultiProvider)
+Himtec2026/
+├── .github/
+│   ├── scripts/
+│   │   └── inject_permissions.py      (Script otomatisasi injeksi AndroidManifest, label AGL, dan ikon)
+│   └── workflows/
+│       └── build-apk.yml              (Workflow CI/CD GitHub Actions untuk kompilasi APK)
+├── assets/
+│   └── icon/                          (Aset ikon resmi AGL multi-resolusi)
+│       ├── app_icon_512.png           (Master ikon resolusi tinggi 512x512)
+│       ├── mipmap-mdpi/               (Ikon launcher standar & bundar densitas medium)
+│       ├── mipmap-hdpi/               (Ikon launcher densitas tinggi)
+│       ├── mipmap-xhdpi/              (Ikon launcher densitas ekstra tinggi)
+│       ├── mipmap-xxhdpi/             (Ikon launcher densitas dobel ekstra tinggi)
+│       └── mipmap-xxxhdpi/            (Ikon launcher densitas tripel ekstra tinggi)
+├── lib/
+│   ├── core/
+│   │   ├── constants/
+│   │   │   └── app_constants.dart     (Konstanta nama aplikasi, versi, dan konfigurasi default)
+│   │   ├── providers/
+│   │   │   ├── auth_provider.dart     (State autentikasi, registrasi, sesi email & akun Google)
+│   │   │   ├── crop_provider.dart     (State manajemen tanaman, catatan perkembangan, dan persistensi)
+│   │   │   └── livestock_provider.dart (State hewan ternak, kalkulator ransum, dan riwayat bobot)
+│   │   ├── router/
+│   │   │   └── app_router.dart        (Konfigurasi GoRouter, routing halaman, dan guard autentikasi)
+│   │   ├── services/
+│   │   │   ├── gemini_service.dart    (Integrasi Google Gemini Vision API & AI Engine lokal)
+│   │   │   └── storage_service.dart   (Layanan penyimpanan data lokal permanen SharedPreferences)
+│   │   └── theme/
+│   │       ├── app_theme.dart         (Definisi tema Material 3 Forest Green mode terang & gelap)
+│   │       └── theme_provider.dart    (Penyedia state pergantian tema aplikasi)
+│   ├── models/
+│   │   ├── crop_model.dart            (Model entitas tanaman, riwayat siram/pupuk, dan jurnal foto)
+│   │   ├── disease_detection_model.dart (Model hasil diagnosa hama dan penyakit AI)
+│   │   ├── livestock_model.dart       (Model hewan ternak, takaran pakan, suplemen, dan catatan bobot)
+│   │   ├── market_city_model.dart     (Model data pasar 11 kota acuan dan komparasi karkas)
+│   │   └── user_model.dart            (Model profil pengguna, identitas anggota, dan sektor usaha)
+│   ├── presentation/
+│   │   ├── screens/
+│   │   │   ├── auth/
+│   │   │   │   ├── login_screen.dart       (Halaman masuk email dan tombol masuk akun Google)
+│   │   │   │   └── register_screen.dart    (Halaman pendaftaran pengguna baru)
+│   │   │   ├── crop/
+│   │   │   │   ├── add_crop_bottom_sheet.dart (Form penambahan tanaman dengan input foto)
+│   │   │   │   └── detail_crop_screen.dart    (Detail siklus tanaman & pencatatan perkembangan berfoto)
+│   │   │   ├── drawer/
+│   │   │   │   ├── help_screen.dart        (Panduan penggunaan aplikasi & pusat konsultasi)
+│   │   │   │   ├── history_screen.dart     (Riwayat aktivitas perawatan tanaman dan ternak)
+│   │   │   │   └── settings_screen.dart    (Pengaturan akun, preferensi tema, dan API key)
+│   │   │   ├── home/
+│   │   │   │   └── home_screen.dart        (Dasbor utama dengan pemilih sektor Tanaman & Ternak)
+│   │   │   ├── livestock/
+│   │   │   │   ├── add_livestock_bottom_sheet.dart (Form input ternak baru dengan input foto)
+│   │   │   │   └── detail_livestock_screen.dart    (Detail pakan, vitamin, & pencatatan bobot berfoto)
+│   │   │   ├── market/
+│   │   │   │   └── market_screen.dart      (Bursa komoditas 11 kota & kalkulator karkas daging)
+│   │   │   ├── pest/
+│   │   │   │   └── pest_screen.dart        (Katalog hama dan penyakit tanaman serta hewan ternak)
+│   │   │   ├── profile/
+│   │   │   │   └── profile_screen.dart     (Informasi profil anggota, statistik, dan tombol keluar)
+│   │   │   ├── scan/
+│   │   │   │   ├── widgets/
+│   │   │   │   │   └── scan_result_sheet.dart (Modal penampil hasil diagnosa AI dan resep obat)
+│   │   │   │   └── disease_scan_screen.dart   (Pemindai kamera langsung & pemilih file galeri)
+│   │   │   └── main_wrapper.dart           (Kerangka navigasi utama 4 tab dan aksi tombol tengah)
+│   │   └── widgets/
+│   │       ├── app_drawer.dart             (Menu navigasi samping profil, pengaturan, dan bantuan)
+│   │       └── custom_app_bar.dart         (Header aplikasi yang konsisten di berbagai layar)
+│   └── main.dart                           (Titik masuk utama aplikasi & inisialisasi MultiProvider)
+├── test/
+│   └── widget_test.dart                    (Pengujian smoke test widget & integrasi tema)
+├── analysis_options.yaml                   (Aturan linting kode Dart resmi Flutter)
+├── pubspec.yaml                            (Daftar dependensi, versi paket, dan deklarasi aset)
+└── README.md                               (Dokumentasi teknis resmi proyek AGL)
 ```
 
-## Build APK Android
+---
 
-Proyek ini telah dikonfigurasi dengan workflow otomatis `.github/workflows/build-apk.yml`. Setiap kali Anda melakukan push ke branch `main`, GitHub Actions akan membangun paket APK rilis (`agl-app-apk`).
+## Fitur & Modul Utama
+
+### 1. Manajemen Sektor Pertanian (Crops)
+- Input komoditas tanaman lengkap dengan varietas, tanggal semai, estimasi panen, dan unggah foto langsung dari kamera atau galeri.
+- Pemantauan kebutuhan harian: jadwal penyiraman air dan pemupukan berkala.
+- Jurnal Catat Perkembangan Tanaman: pencatatan pertumbuhan tinggi dan kondisi vegetatif disertai dokumentasi foto real-time.
+
+### 2. Manajemen Sektor Peternakan (Livestock)
+- Input populasi hewan ternak (sapi potong, sapi perah, kambing, domba, ayam broiler, ayam layer) dengan nomor tag telinga/kandang dan unggah foto.
+- Kalkulasi otomatis kebutuhan pakan harian: proporsi ransum hijauan, konsentrat pakan, dan volume kebutuhan air bersih.
+- Rekomendasi suplemen vitamin dan mineral penting untuk mengoptimalkan kekebalan dan bobot harian.
+- Jurnal Catat Perkembangan Ternak: pencatatan penambahan bobot badan (timbang rutin) dan catatan kesehatan lengkap dengan dokumentasi foto.
+
+### 3. Pemindai Diagnosa Hama & Penyakit AI (Vision AI)
+- Pemindaian langsung menggunakan kamera dengan kontrol senter penerangan untuk area daun atau bagian tubuh hewan.
+- Diagnosa instan nama penyakit, taksonomi latin, tingkat keparahan, dan persentase keyakinan.
+- Rekomendasi tindakan kuratif herbal/organik dan langkah preventif jangka panjang.
+
+### 4. Bursa Pasar 11 Kota & Kalkulator Karkas Daging
+- Pantauan harga komoditas pangan dan peternakan di 11 kota sentra ekonomi Indonesia.
+- Kalkulator komparasi cerdas: menganalisis apakah peternak memperoleh laba lebih tinggi dengan menjual timbang hidup langsung atau dipotong menjadi daging karkas dan hasil sampingan.
+
+---
+
+## Panduan Instalasi & Menjalankan Aplikasi
+
+### Prasyarat
+- Flutter SDK versi 3.0.0 atau yang lebih baru.
+- Android Studio / VS Code dengan ekstensi Flutter & Dart.
+- Java JDK 17 (disarankan Eclipse Temurin 17).
+- Perangkat Android fisik atau emulator Android (API level 24 atau lebih tinggi).
+
+### Langkah-langkah
+1. **Kloning Repositori**:
+   ```bash
+   git clone https://github.com/anisawulandari22/Himtec2026.git
+   cd Himtec2026
+   ```
+
+2. **Unduh Dependensi**:
+   ```bash
+   flutter pub get
+   ```
+
+3. **Verifikasi Integritas Kode**:
+   ```bash
+   flutter analyze --no-fatal-infos
+   ```
+
+4. **Jalankan Aplikasi pada Perangkat**:
+   ```bash
+   flutter run
+   ```
+
+---
+
+## Build APK & Otomatisasi CI/CD
+
+Proyek ini telah dilengkapi dengan pipeline CI/CD otomatis berbasis GitHub Actions (`.github/workflows/build-apk.yml`).
+
+### Build Manual via Baris Perintah
+Untuk mengompilasi berkas APK secara mandiri:
+```bash
+# Debug APK
+flutter build apk --debug
+
+# Release APK
+flutter build apk --release
+```
+Berkas APK yang dihasilkan berada pada direktori:
+`build/app/outputs/flutter-apk/app-release.apk`
+
+### Unduh APK dari GitHub Actions
+Setiap pembaruan (*push*) ke branch `main`, GitHub Actions akan menjalankan proses otomatis:
+1. Menyiapkan lingkungan Java 17 dan Flutter SDK stable.
+2. Menjalankan skrip `inject_permissions.py` untuk mengonfigurasi label aplikasi `AGL`, hak akses kamera dan penyimpanan, serta ikon resolusi tinggi.
+3. Melakukan verifikasi kode melalui `flutter analyze` dan `flutter test`.
+4. Mengompilasi APK Android dan mengunggah artefak build yang dapat langsung diunduh pada tab **Actions** di repositori GitHub.
