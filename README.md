@@ -1,4 +1,4 @@
-# HIMTEC Mobile - Android Flutter Architecture
+# HIMTEC - Android Flutter Architecture
 
 Aplikasi Android resmi untuk himpunan mahasiswa dengan arsitektur bersih, modular, dan gaya visual Material Design 3 hijau industrial minimalis (Forest Green & Muted Sage).
 
