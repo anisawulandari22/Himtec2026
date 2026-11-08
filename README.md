@@ -25,7 +25,6 @@ Aplikasi dirancang dengan standar arsitektur bersih, tata letak Material Design 
   - Primary: Deep Forest Green (`#104B36` dan `#196B4A`)
   - Accent / Secondary: Fresh Sage (`#EAF3E7` dan `#526921`)
   - Background & Surface: Nature Off-White (`#FAFBF7`) dan Dark Pine (`#111714`)
-- **Tanpa Emoji (Zero Emojis)**: Semua representasi visual murni menggunakan ikon vektor Material Icons resmi (`Icons.*`) dengan hierarki tipografi tegas dan garis pemisah halus (*hairline borders*).
 - **Penyimpanan Persisten Permanen**: Seluruh data pengguna, koleksi tanaman, populasi ternak, catatan jurnal foto, dan preferensi tersimpan secara offline di penyimpanan lokal perangkat sehingga tidak hilang saat aplikasi ditutup.
 
 ---
